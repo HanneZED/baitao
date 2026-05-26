@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
+  <title id="title">资料归档封面</title>
+  <desc id="desc">多彩标签卡片和收藏夹组成的个人资料库封面。</desc>
+  <rect width="720" height="520" rx="36" fill="#f3efff"/>
+  <path d="M112 146h490v282H112z" fill="#fffdf7" stroke="#5a4d70" stroke-width="10"/>
+  <path d="M112 146h192l36 48h262v64H112z" fill="#c8f5ec" stroke="#5a4d70" stroke-width="10"/>
+  <rect x="165" y="302" width="125" height="70" rx="8" fill="#ffd0df" stroke="#5a4d70" stroke-width="8"/>
+  <rect x="318" y="302" width="125" height="70" rx="8" fill="#fff0a6" stroke="#5a4d70" stroke-width="8"/>
+  <rect x="471" y="302" width="75" height="70" rx="8" fill="#bfeeff" stroke="#5a4d70" stroke-width="8"/>
+  <path d="M161 90l23 14 23-14-14 23 14 23-23-14-23 14 14-23z" fill="#ff9ec1" stroke="#5a4d70" stroke-width="7"/>
+  <path d="M542 83c22 0 40 18 40 40s-18 40-40 40-40-18-40-40 18-40 40-40Z" fill="#ffe778" stroke="#5a4d70" stroke-width="8"/>
+</svg>

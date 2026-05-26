@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
+  <title id="title">插画作品封面</title>
+  <desc id="desc">粉紫色画板与星形贴纸组成的插画项目封面。</desc>
+  <rect width="720" height="520" rx="36" fill="#fff0f7"/>
+  <path d="M88 88h420c42 0 76 34 76 76v208c0 42-34 76-76 76H88z" fill="#f5e7ff" stroke="#5f4a74" stroke-width="10"/>
+  <path d="M165 165h244v180H165z" fill="#fffdf9" stroke="#5f4a74" stroke-width="8"/>
+  <path d="M190 306c44-62 85-79 125-51 41 29 75 18 111-31" fill="none" stroke="#f28cad" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="401" cy="182" r="25" fill="#ffe778" stroke="#5f4a74" stroke-width="7"/>
+  <path d="M561 120l25 15 25-15-15 25 15 25-25-15-25 15 15-25z" fill="#acefdf" stroke="#5f4a74" stroke-width="7"/>
+  <path d="M519 344c46 0 84 37 84 84s-38 84-84 84-84-37-84-84 38-84 84-84Z" fill="#ffc4d8" stroke="#5f4a74" stroke-width="9"/>
+  <path d="M488 426h62M519 395v62" stroke="#5f4a74" stroke-width="10" stroke-linecap="round"/>
+</svg>

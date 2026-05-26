@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
+  <title id="title">攻略笔记封面</title>
+  <desc id="desc">薄荷色路线地图与便签组成的攻略笔记封面。</desc>
+  <rect width="720" height="520" rx="36" fill="#e8fbf5"/>
+  <path d="M126 92h384c39 0 70 31 70 70v264H126z" fill="#fffdf7" stroke="#4e6072" stroke-width="10"/>
+  <path d="M186 180c56-40 109-35 157 14s100 52 156 10" fill="none" stroke="#81d8c5" stroke-width="18" stroke-linecap="round" stroke-dasharray="2 34"/>
+  <path d="M205 339h286" stroke="#4e6072" stroke-width="12" stroke-linecap="round"/>
+  <path d="M205 385h190" stroke="#4e6072" stroke-width="12" stroke-linecap="round"/>
+  <path d="M501 114l28 17 28-17-17 28 17 28-28-17-28 17 17-28z" fill="#ffe778" stroke="#4e6072" stroke-width="7"/>
+  <path d="M103 317h147v112H103z" fill="#ffd2e2" stroke="#4e6072" stroke-width="8"/>
+  <path d="M128 353h88M128 389h58" stroke="#4e6072" stroke-width="9" stroke-linecap="round"/>
+</svg>

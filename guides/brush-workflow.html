@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="插画笔刷与上色流程攻略详情页。" />
+    <meta name="theme-color" content="#fff8fb" />
+    <title>插画笔刷与上色流程 | 肥窝</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@500;700&family=Quicksand:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      document.documentElement.classList.add("js");
+    </script>
+    <link rel="stylesheet" href="../styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="../app.js"></script>
+  </head>
+  <body class="guide-page">
+    <div class="progress-line" aria-hidden="true"></div>
+    <div class="soft-grid" aria-hidden="true"></div>
+    <a class="skip-link" href="#article">跳到攻略内容</a>
+
+    <header class="site-header" data-reveal>
+      <a class="brand" href="../index.html" aria-label="返回肥窝首页">
+        <span class="brand-badge">
+          <img src="../img/icon.jpg" alt="水汽白桃头像" />
+        </span>
+        <span>
+          <strong>肥窝</strong>
+          <small>水汽白桃的橱窗</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="主导航">
+        <a href="../index.html#works">作品</a>
+        <a href="../index.html#guides">攻略</a>
+        <a href="../index.html#diary">手帐</a>
+        <a href="../index.html#contact">联系</a>
+      </nav>
+      <button class="theme-toggle magnetic" type="button" aria-label="切换明暗模式">
+        <span class="icon-fallback" aria-hidden="true">主题</span>
+        <i data-lucide="sun" class="icon-sun" aria-hidden="true"></i>
+        <i data-lucide="moon" class="icon-moon" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <main>
+      <section class="guide-hero" aria-labelledby="guide-title">
+        <div>
+          <p class="eyebrow" data-reveal>绘画流程 / 笔刷记录</p>
+          <h1 id="guide-title" class="guide-title" data-split>
+            <span>插画笔刷</span>
+            <span>上色流程</span>
+          </h1>
+          <p class="guide-summary" data-reveal>
+            这页适合放个人绘画 SOP：每次新建画布、起稿、线稿、铺色和导出时都照着走，
+            减少“今天不知道用哪个笔刷”的消耗。
+          </p>
+          <div class="guide-actions" data-reveal>
+            <a class="button button-primary magnetic" href="../index.html#guides">
+              <span>返回攻略库</span>
+              <i data-lucide="arrow-left" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+        <div class="guide-visual" data-reveal>
+          <img src="../assets/work-illustration.svg" alt="粉紫色插画项目封面" />
+        </div>
+      </section>
+
+      <section class="article-layout" id="article">
+        <aside class="article-nav" data-reveal aria-label="文章目录">
+          <strong>目录</strong>
+          <a href="#setup">画布准备</a>
+          <a href="#steps">绘制流程</a>
+          <a href="#checklist">导出检查</a>
+          <a href="#related">相关攻略</a>
+        </aside>
+
+        <div class="article-stack">
+          <article class="article-panel" id="setup" data-reveal>
+            <p class="article-meta">01 / Canvas</p>
+            <h2>先固定画布和图层命名。</h2>
+            <p>
+              默认用社交平台友好的比例，比如 4:5 或 1:1。图层按草稿、线稿、固有色、阴影、光效、后期命名，
+              以后翻文件时会轻松很多。
+            </p>
+          </article>
+
+          <article class="article-panel" id="steps" data-reveal>
+            <p class="article-meta">02 / Flow</p>
+            <h2>从松到紧，再从大到小。</h2>
+            <ol>
+              <li>用低透明度铅笔笔刷起稿，只处理轮廓和姿态。</li>
+              <li>线稿只保留最重要的边缘，头发、眼睛和饰品单独分组。</li>
+              <li>先铺大色块，再统一加一层偏冷或偏暖的阴影。</li>
+              <li>最后用小面积高光、贴纸和背景元素提升完成感。</li>
+            </ol>
+          </article>
+
+          <article class="article-panel" id="checklist" data-reveal>
+            <p class="article-meta">03 / Export</p>
+            <h2>发布前检查这几项。</h2>
+            <div class="check-grid">
+              <div class="check-item">头像和主体在缩略图里是否清楚</div>
+              <div class="check-item">高光是否过曝，暗部是否糊成一片</div>
+              <div class="check-item">签名、水印和发布日期是否放好</div>
+              <div class="check-item">是否导出 PNG 和压缩 JPG 两个版本</div>
+            </div>
+          </article>
+
+          <article class="article-panel" id="related" data-reveal>
+            <p class="article-meta">04 / Related</p>
+            <h2>继续翻一页</h2>
+            <div class="related-grid">
+              <a class="related-card" href="./archive-tags.html">
+                <span>归档攻略</span>
+                <h3>作品与资料标签系统</h3>
+                <p>给源文件、导出图和参考素材设置统一标签。</p>
+              </a>
+              <a class="related-card" href="./cozy-desk.html">
+                <span>生活攻略</span>
+                <h3>可爱桌面布置清单</h3>
+                <p>给绘画和拍照准备一个更顺手的小角落。</p>
+              </a>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

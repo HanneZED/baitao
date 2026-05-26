@@ -55,6 +55,12 @@ html[data-theme="dark"] {
   --inverse: #201725;
 }
 
+html[data-theme="dark"] .site-header.is-compact,
+html[data-theme="dark"] .music-player.is-compact:not(:hover):not(:focus-within) {
+  background: rgba(48, 35, 55, 0.94);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.3);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -184,6 +190,20 @@ img {
   background: var(--surface);
   box-shadow: var(--shadow);
   backdrop-filter: blur(20px);
+  transition:
+    top 260ms var(--ease),
+    min-height 260ms var(--ease),
+    padding 260ms var(--ease),
+    background 260ms var(--ease),
+    box-shadow 260ms var(--ease);
+}
+
+.site-header.is-compact {
+  top: 0.65rem;
+  min-height: 58px;
+  padding: 0.42rem 0.52rem;
+  background: rgba(255, 254, 251, 0.94);
+  box-shadow: 0 12px 34px rgba(132, 92, 82, 0.12);
 }
 
 .brand {
@@ -193,6 +213,12 @@ img {
   width: max-content;
   min-height: 48px;
   cursor: pointer;
+  transition: min-height 260ms var(--ease), gap 260ms var(--ease);
+}
+
+.site-header.is-compact .brand {
+  gap: 0.55rem;
+  min-height: 44px;
 }
 
 .brand-badge {
@@ -208,6 +234,13 @@ img {
   font-family: var(--font-display);
   font-size: 1rem;
   overflow: hidden;
+  transition: width 260ms var(--ease), height 260ms var(--ease), box-shadow 260ms var(--ease);
+}
+
+.site-header.is-compact .brand-badge {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 6px 16px rgba(132, 92, 82, 0.1);
 }
 
 .brand-badge img {
@@ -231,6 +264,13 @@ img {
   font-family: "Quicksand", sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
+  transform-origin: left center;
+  transition: opacity 220ms var(--ease), transform 220ms var(--ease);
+}
+
+.site-header.is-compact .brand small {
+  opacity: 0;
+  transform: translateY(-3px) scale(0.94);
 }
 
 .main-nav {
@@ -249,7 +289,15 @@ img {
   padding: 0.6rem 0.85rem;
   color: var(--muted);
   font-weight: 700;
-  transition: color 180ms var(--ease), background 180ms var(--ease), border-color 180ms var(--ease);
+  transition:
+    color 180ms var(--ease),
+    background 180ms var(--ease),
+    border-color 180ms var(--ease),
+    padding 260ms var(--ease);
+}
+
+.site-header.is-compact .main-nav a {
+  padding: 0.48rem 0.75rem;
 }
 
 .main-nav a:hover {
@@ -269,7 +317,17 @@ img {
   color: var(--text);
   cursor: pointer;
   box-shadow: 0 8px 22px rgba(132, 92, 82, 0.08);
-  transition: transform 180ms var(--ease-pop), background 180ms var(--ease), border-color 180ms var(--ease);
+  transition:
+    transform 180ms var(--ease-pop),
+    background 180ms var(--ease),
+    border-color 180ms var(--ease),
+    width 260ms var(--ease),
+    height 260ms var(--ease);
+}
+
+.site-header.is-compact .theme-toggle {
+  width: 44px;
+  height: 44px;
 }
 
 .theme-toggle:hover {
@@ -323,6 +381,35 @@ html[data-theme="dark"] .icon-sun {
   background: var(--surface);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
+  transition:
+    width 260ms var(--ease),
+    grid-template-columns 260ms var(--ease),
+    padding 260ms var(--ease),
+    background 260ms var(--ease),
+    box-shadow 260ms var(--ease);
+}
+
+.music-player.is-compact:not(:hover):not(:focus-within) {
+  grid-template-columns: 46px 0 0 0;
+  gap: 0;
+  width: 64px;
+  padding: 0.45rem 0.5rem;
+  background: rgba(255, 254, 251, 0.92);
+  box-shadow: 0 12px 34px rgba(132, 92, 82, 0.12);
+}
+
+.music-player.is-compact:not(:hover):not(:focus-within) .music-meta,
+.music-player.is-compact:not(:hover):not(:focus-within) .music-skip,
+.music-player.is-compact:not(:hover):not(:focus-within) .music-volume {
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.music-meta,
+.music-skip,
+.music-volume {
+  transition: opacity 180ms var(--ease), visibility 180ms var(--ease);
 }
 
 .music-toggle {
@@ -607,7 +694,7 @@ html[data-theme="dark"] .icon-sun {
 
 .card-ribbon {
   position: absolute;
-  top: 1rem;
+  top: 0.58rem;
   right: 1rem;
   z-index: 2;
   border: 1px solid var(--line-strong);
@@ -897,7 +984,7 @@ html[data-theme="dark"] .icon-sun {
 .showcase-carousel {
   position: relative;
   display: grid;
-  aspect-ratio: 1.22;
+  aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -926,17 +1013,18 @@ html[data-theme="dark"] .icon-sun {
   opacity: 0.62;
 }
 
-.showcase-slide {
+.showcase-carousel .showcase-slide {
   grid-area: 1 / 1;
   z-index: 1;
   align-self: center;
   justify-self: center;
-  width: calc(100% - 1.25rem);
-  height: calc(100% - 1.25rem);
+  width: calc(100% - 1rem);
+  height: calc(100% - 1rem);
+  aspect-ratio: 1;
   object-fit: contain;
   border: 1px solid var(--line);
   border-radius: 6px;
-  padding: 0.55rem;
+  padding: 0.45rem;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 248, 251, 0.94)),
     var(--surface-solid);
@@ -951,22 +1039,22 @@ html[data-theme="dark"] .icon-sun {
   filter: saturate(0.9) brightness(1.02);
 }
 
-.showcase-slide.is-prev,
-.showcase-slide.is-next {
+.showcase-carousel .showcase-slide.is-prev,
+.showcase-carousel .showcase-slide.is-next {
   z-index: 2;
   opacity: 0.42;
   filter: saturate(0.82) brightness(1.04);
 }
 
-.showcase-slide.is-prev {
+.showcase-carousel .showcase-slide.is-prev {
   transform: translateX(-8%) translateY(2%) scale(0.88) rotate(-5deg);
 }
 
-.showcase-slide.is-next {
+.showcase-carousel .showcase-slide.is-next {
   transform: translateX(8%) translateY(2%) scale(0.88) rotate(5deg);
 }
 
-.showcase-slide.is-active {
+.showcase-carousel .showcase-slide.is-active {
   z-index: 3;
   opacity: 1;
   transform: translateY(0) scale(1) rotate(0deg);
@@ -1340,6 +1428,8 @@ html[data-theme="dark"] .contact-item svg {
   max-height: calc(100dvh - 2rem);
   margin: 1rem auto;
   overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--bg);
@@ -1399,6 +1489,7 @@ html[data-theme="dark"] .contact-item svg {
 }
 
 .guide-view-content {
+  min-height: 0;
   outline: 0;
 }
 
@@ -1742,7 +1833,7 @@ html[data-theme="dark"] .guide-view-shell {
   }
 
   .showcase-carousel {
-    aspect-ratio: 1.05;
+    aspect-ratio: 1;
   }
 
   .diary-note:nth-child(2),

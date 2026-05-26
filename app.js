@@ -67,6 +67,7 @@ function setupSmoothScroll() {
     smoothWheel: true,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
   });
+  window.kawaiiLenis = lenis;
 
   function raf(time) {
     lenis.raf(time);
@@ -74,6 +75,29 @@ function setupSmoothScroll() {
   }
 
   requestAnimationFrame(raf);
+}
+
+function setSmoothScrollPaused(paused) {
+  const lenis = window.kawaiiLenis;
+  if (!lenis) return;
+  if (paused) lenis.stop?.();
+  else lenis.start?.();
+}
+
+function setupChromeCompact() {
+  const header = document.querySelector(".site-header");
+  const musicPlayer = document.querySelector("[data-music-player]");
+  if (!header && !musicPlayer) return;
+
+  const update = () => {
+    const compact = window.scrollY > 72;
+    header?.classList.toggle("is-compact", compact);
+    musicPlayer?.classList.toggle("is-compact", compact);
+  };
+
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
 }
 
 function revealWithFallback() {
@@ -587,6 +611,7 @@ function setupGuideFilter() {
 function setupGuideView() {
   const view = document.querySelector("[data-guide-view]");
   const content = document.querySelector("[data-guide-content]");
+  const shell = view?.querySelector(".guide-view-shell");
   const status = document.querySelector("[data-guide-status]");
   const title = document.querySelector("#guide-view-title");
   const closeTriggers = document.querySelectorAll("[data-guide-close]");
@@ -611,6 +636,7 @@ function setupGuideView() {
     view.hidden = false;
     view.setAttribute("aria-hidden", "false");
     document.body.classList.add("is-guide-view-open");
+    setSmoothScrollPaused(true);
   };
 
   const hideView = () => {
@@ -618,6 +644,7 @@ function setupGuideView() {
     view.hidden = true;
     view.setAttribute("aria-hidden", "true");
     document.body.classList.remove("is-guide-view-open");
+    setSmoothScrollPaused(false);
     content.replaceChildren();
     status.textContent = "";
     title.textContent = "攻略详情";
@@ -735,6 +762,14 @@ function setupGuideView() {
     trigger.addEventListener("click", closeGuide);
   });
 
+  shell?.addEventListener(
+    "wheel",
+    (event) => {
+      event.stopPropagation();
+    },
+    { passive: true },
+  );
+
   window.addEventListener("popstate", (event) => {
     if (event.state?.guideView && event.state.guideUrl) {
       openGuide(event.state.guideUrl, {
@@ -752,6 +787,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupThemeToggle();
   setupProgress();
   setupSmoothScroll();
+  setupChromeCompact();
   revealWithFallback();
   setupAnimeLoops();
   setupHeroArtworkSlider();

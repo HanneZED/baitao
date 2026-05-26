@@ -100,6 +100,38 @@ function setupChromeCompact() {
   window.addEventListener("resize", update);
 }
 
+function setupStatusCategory() {
+  const panels = [...document.querySelectorAll("[data-status-panel]")];
+  if (!panels.length) return;
+
+  const syncPanel = (panel) => {
+    const toggle = panel.querySelector("[data-status-toggle]");
+    const wrap = panel.querySelector("[data-status-grid-wrap]");
+    if (!toggle || !wrap) return;
+
+    const expanded = toggle.getAttribute("aria-expanded") !== "false";
+    panel.classList.toggle("is-open", expanded);
+    panel.classList.toggle("is-collapsed", !expanded);
+    wrap.style.maxHeight = expanded ? `${wrap.scrollHeight}px` : "0px";
+  };
+
+  panels.forEach((panel) => {
+    const toggle = panel.querySelector("[data-status-toggle]");
+    if (!toggle) return;
+
+    syncPanel(panel);
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") !== "false";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      syncPanel(panel);
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    panels.forEach(syncPanel);
+  });
+}
+
 function revealWithFallback() {
   const revealItems = document.querySelectorAll("[data-reveal]");
   const splitItems = document.querySelectorAll("[data-split]");
@@ -788,6 +820,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupProgress();
   setupSmoothScroll();
   setupChromeCompact();
+  setupStatusCategory();
   revealWithFallback();
   setupAnimeLoops();
   setupHeroArtworkSlider();

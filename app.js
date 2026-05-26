@@ -584,6 +584,169 @@ function setupGuideFilter() {
   search.addEventListener("input", apply);
 }
 
+function setupGuideView() {
+  const view = document.querySelector("[data-guide-view]");
+  const content = document.querySelector("[data-guide-content]");
+  const status = document.querySelector("[data-guide-status]");
+  const title = document.querySelector("#guide-view-title");
+  const closeTriggers = document.querySelectorAll("[data-guide-close]");
+  const guideLinks = document.querySelectorAll(".guide-card[href]");
+  if (!view || !content || !status || !title || !guideLinks.length) return;
+
+  const homeTitle = document.title;
+  let lastFocused = null;
+  let guideDepth = 0;
+  let requestId = 0;
+
+  if (!history.state || typeof history.state.guideView === "undefined") {
+    history.replaceState({ guideView: false, guideDepth: 0 }, "", window.location.href);
+  }
+
+  const isGuideUrl = (url) => {
+    const target = new URL(url, window.location.href);
+    return target.origin === window.location.origin && /\/guides\/[^/]+\.html$/.test(target.pathname);
+  };
+
+  const showView = () => {
+    view.hidden = false;
+    view.setAttribute("aria-hidden", "false");
+    document.body.classList.add("is-guide-view-open");
+  };
+
+  const hideView = () => {
+    requestId += 1;
+    view.hidden = true;
+    view.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("is-guide-view-open");
+    content.replaceChildren();
+    status.textContent = "";
+    title.textContent = "攻略详情";
+    document.title = homeTitle;
+    guideDepth = 0;
+    lastFocused?.focus?.();
+  };
+
+  const normalizeGuideContent = (baseUrl) => {
+    content.querySelectorAll("img[src]").forEach((image) => {
+      image.src = new URL(image.getAttribute("src"), baseUrl).href;
+    });
+
+    content.querySelectorAll("a[href]").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+      link.href = new URL(href, baseUrl).href;
+    });
+
+    content.querySelectorAll("[data-reveal], [data-split]").forEach((item) => {
+      item.classList.add("is-visible");
+    });
+  };
+
+  const openGuide = async (url, { push = true, depth = guideDepth + 1 } = {}) => {
+    const currentRequest = ++requestId;
+    const guideUrl = new URL(url, window.location.href);
+    lastFocused = document.activeElement;
+    showView();
+    content.replaceChildren();
+    status.textContent = "正在展开攻略...";
+    title.textContent = "攻略详情";
+
+    try {
+      const response = await fetch(guideUrl.href);
+      if (!response.ok) throw new Error("guide unavailable");
+
+      const html = await response.text();
+      if (currentRequest !== requestId) return;
+
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const guideMain = doc.querySelector("main");
+      const guideTitle = doc.querySelector(".guide-title")?.textContent?.trim() || "攻略详情";
+      if (!guideMain) throw new Error("guide content missing");
+
+      content.replaceChildren(guideMain.cloneNode(true));
+      normalizeGuideContent(guideUrl.href);
+      title.textContent = guideTitle;
+      document.title = doc.title || `${guideTitle} | 肥窝`;
+      status.textContent = "";
+      content.scrollTop = 0;
+      content.focus({ preventScroll: true });
+      view.querySelector(".guide-view-shell")?.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+      bootIcons();
+
+      if (push) {
+        guideDepth = depth;
+        history.pushState(
+          { guideView: true, guideUrl: guideUrl.href, guideDepth },
+          "",
+          `${guideUrl.pathname}${guideUrl.search}${guideUrl.hash}`,
+        );
+      } else {
+        guideDepth = depth;
+      }
+    } catch {
+      status.textContent = "攻略暂时打不开，请稍后再试。";
+    }
+  };
+
+  const closeGuide = () => {
+    if (history.state?.guideView && guideDepth > 0) {
+      history.go(-guideDepth);
+      return;
+    }
+    hideView();
+  };
+
+  guideLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (!isGuideUrl(link.href)) return;
+      event.preventDefault();
+      openGuide(link.href);
+    });
+  });
+
+  content.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href]");
+    if (!link) return;
+
+    const href = link.getAttribute("href");
+    if (href?.startsWith("#")) {
+      const target = content.querySelector(href);
+      if (!target) return;
+      event.preventDefault();
+      target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      return;
+    }
+
+    const targetUrl = new URL(link.href, window.location.href);
+    if (targetUrl.origin === window.location.origin && targetUrl.pathname.endsWith("/index.html")) {
+      event.preventDefault();
+      closeGuide();
+      return;
+    }
+
+    if (isGuideUrl(targetUrl.href)) {
+      event.preventDefault();
+      openGuide(targetUrl.href);
+    }
+  });
+
+  closeTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", closeGuide);
+  });
+
+  window.addEventListener("popstate", (event) => {
+    if (event.state?.guideView && event.state.guideUrl) {
+      openGuide(event.state.guideUrl, {
+        push: false,
+        depth: Number(event.state.guideDepth) || 1,
+      });
+      return;
+    }
+    hideView();
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   bootIcons();
   setupThemeToggle();
@@ -600,4 +763,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupInfoCards();
   setupMusicPlayer();
   setupGuideFilter();
+  setupGuideView();
 });

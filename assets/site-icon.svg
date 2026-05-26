@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">肥窝草莓蛋糕图标</title>
+  <desc id="desc">一块粉色草莓奶油蛋糕，适合作为水汽白桃个人小站图标。</desc>
+  <rect width="128" height="128" rx="32" fill="#fff8fb"/>
+  <circle cx="34" cy="28" r="18" fill="#fde8ee"/>
+  <circle cx="96" cy="36" r="20" fill="#fff1cf"/>
+  <path d="M25 83c0-15 12-27 27-27h24c15 0 27 12 27 27v4c0 10-8 18-18 18H43c-10 0-18-8-18-18v-4Z" fill="#f6d7df" stroke="#8a625e" stroke-width="4"/>
+  <path d="M35 62c6-14 17-24 29-24s23 10 29 24H35Z" fill="#fff6ea" stroke="#8a625e" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M39 64c5 7 10 7 15 0 5 7 10 7 15 0 5 7 10 7 15 0 4 5 8 6 13 2v16H31V66c3 2 6 2 8-2Z" fill="#fffefb" stroke="#8a625e" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M64 37c-10-8-10-19-2-25 8 7 8 18 2 25Z" fill="#8ac7a7" stroke="#5f7467" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M58 39c-11-1-18-9-16-19 10 1 18 8 16 19Z" fill="#a9d8d0" stroke="#5f7467" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M70 39c11-1 18-9 16-19-10 1-18 8-16 19Z" fill="#a9d8d0" stroke="#5f7467" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M52 45c0-10 6-18 12-18s12 8 12 18c0 8-5 14-12 14s-12-6-12-14Z" fill="#e95873" stroke="#8a3d4b" stroke-width="4"/>
+  <circle cx="59" cy="42" r="2" fill="#fff1cf"/>
+  <circle cx="68" cy="43" r="2" fill="#fff1cf"/>
+  <circle cx="64" cy="51" r="2" fill="#fff1cf"/>
+  <path d="M43 105h42" stroke="#8a625e" stroke-width="4" stroke-linecap="round"/>
+</svg>

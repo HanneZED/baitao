@@ -684,6 +684,280 @@ function setupMusicPlayer() {
   audio.addEventListener("pause", syncPlayingState);
 }
 
+function setupWebPet() {
+  const pet = document.querySelector("[data-web-pet]");
+  const petStage = document.querySelector("[data-pet-toggle]");
+  const closeButton = document.querySelector("[data-pet-close]");
+  const summonButton = document.querySelector("[data-pet-summon]");
+  const musicPlayer = document.querySelector("[data-music-player]");
+  if (!pet || !petStage || !closeButton || !summonButton) return;
+
+  const states = {
+    idle: { row: 0, duration: 860 },
+    walkRight: { row: 1, duration: 700 },
+    walkLeft: { row: 2, duration: 700 },
+    wave: { row: 3, duration: 680, hold: 1500 },
+    jump: { row: 4, duration: 720, hold: 1150 },
+    sad: { row: 5, duration: 920, hold: 1650 },
+    waiting: { row: 6, duration: 980, hold: 1700 },
+    working: { row: 7, duration: 820, hold: 1650 },
+    review: { row: 8, duration: 900, hold: 1700 },
+  };
+  const expressionNames = ["wave", "jump", "sad", "waiting", "working", "review"];
+  const interactionCooldownMs = 3200;
+  const randomBetween = (min, max) => min + Math.random() * (max - min);
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  let actionTimer = null;
+  let expressionTimer = null;
+  let controlTimer = null;
+  let moveFrame = null;
+  let lastExpression = "";
+  let interactionReadyAt = 0;
+  let isDragging = false;
+  let ignoreNextClick = false;
+  let position = { x: 0, y: 0 };
+
+  const setControlsOpen = (open) => {
+    window.clearTimeout(controlTimer);
+    pet.classList.toggle("is-control-open", open);
+    closeButton.setAttribute("tabindex", open ? "0" : "-1");
+    if (open) {
+      controlTimer = window.setTimeout(() => setControlsOpen(false), 9000);
+    }
+  };
+
+  const setState = (name) => {
+    const state = states[name] || states.idle;
+    pet.dataset.petState = name;
+    pet.style.setProperty("--pet-row", state.row.toString());
+    pet.style.setProperty("--pet-frame-duration", `${state.duration}ms`);
+  };
+
+  const getPetSize = () => {
+    const rect = pet.getBoundingClientRect();
+    return {
+      width: rect.width || 132,
+      height: rect.height || 150,
+    };
+  };
+
+  const clampPosition = (nextPosition = position) => {
+    const size = getPetSize();
+    const margin = 10;
+    return {
+      x: clamp(nextPosition.x, margin, Math.max(margin, window.innerWidth - size.width - margin)),
+      y: clamp(nextPosition.y, margin, Math.max(margin, window.innerHeight - size.height - margin)),
+    };
+  };
+
+  const applyPosition = () => {
+    pet.style.left = `${position.x}px`;
+    pet.style.top = `${position.y}px`;
+    pet.style.right = "auto";
+    pet.style.bottom = "auto";
+  };
+
+  const stopMove = () => {
+    if (moveFrame) {
+      window.cancelAnimationFrame(moveFrame);
+      moveFrame = null;
+    }
+    pet.classList.remove("is-walking");
+  };
+
+  const scheduleNextAction = () => {
+    window.clearTimeout(actionTimer);
+    if (reducedMotion || pet.classList.contains("is-hidden")) return;
+
+    actionTimer = window.setTimeout(() => {
+      if (isDragging || pet.classList.contains("is-hidden")) {
+        scheduleNextAction();
+        return;
+      }
+
+      if (Math.random() < 0.62) {
+        walkSomewhere();
+      } else {
+        playExpression("auto");
+      }
+    }, randomBetween(7600, 14500));
+  };
+
+  const setVisible = (visible) => {
+    pet.classList.toggle("is-hidden", !visible);
+    pet.setAttribute("aria-hidden", String(!visible));
+    petStage.setAttribute("tabindex", visible ? "0" : "-1");
+    summonButton.setAttribute("aria-pressed", String(visible));
+    summonButton.setAttribute("aria-label", visible ? "摸摸 Cream Cat 小宠物" : "召回 Cream Cat 小宠物");
+    musicPlayer?.classList.toggle("is-pet-visible", visible);
+    if (visible) {
+      scheduleNextAction();
+      return;
+    }
+
+    stopMove();
+    window.clearTimeout(actionTimer);
+    window.clearTimeout(expressionTimer);
+    setControlsOpen(false);
+    setState("idle");
+  };
+
+  const playExpression = (source = "auto") => {
+    if (pet.classList.contains("is-hidden") || isDragging || moveFrame) return false;
+
+    const now = Date.now();
+    if (source === "user" && now < interactionReadyAt) {
+      pet.classList.add("is-interaction-cooling");
+      window.setTimeout(() => pet.classList.remove("is-interaction-cooling"), 260);
+      return false;
+    }
+
+    if (source === "user") interactionReadyAt = now + interactionCooldownMs;
+    window.clearTimeout(expressionTimer);
+    window.clearTimeout(actionTimer);
+
+    const candidates = expressionNames.filter((name) => name !== lastExpression);
+    const nextName = candidates[Math.floor(Math.random() * candidates.length)] || "wave";
+    lastExpression = nextName;
+    setState(nextName);
+
+    expressionTimer = window.setTimeout(() => {
+      setState("idle");
+      scheduleNextAction();
+    }, states[nextName].hold);
+
+    return true;
+  };
+
+  function walkSomewhere() {
+    if (pet.classList.contains("is-hidden") || isDragging || moveFrame) return;
+
+    const target = clampPosition({
+      x: position.x + randomBetween(-180, 180),
+      y: position.y + randomBetween(-74, 58),
+    });
+    const distance = Math.hypot(target.x - position.x, target.y - position.y);
+    if (distance < 46) {
+      scheduleNextAction();
+      return;
+    }
+
+    window.clearTimeout(actionTimer);
+    window.clearTimeout(expressionTimer);
+    const start = { ...position };
+    const duration = clamp(distance * 11, 1350, 2850);
+    const startedAt = performance.now();
+    setState(target.x >= start.x ? "walkRight" : "walkLeft");
+    pet.classList.add("is-walking");
+
+    const tick = (now) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 0.5 - Math.cos(progress * Math.PI) / 2;
+      position = {
+        x: start.x + (target.x - start.x) * eased,
+        y: start.y + (target.y - start.y) * eased,
+      };
+      applyPosition();
+
+      if (progress < 1) {
+        moveFrame = window.requestAnimationFrame(tick);
+        return;
+      }
+
+      moveFrame = null;
+      position = target;
+      applyPosition();
+      pet.classList.remove("is-walking");
+      setState("idle");
+      scheduleNextAction();
+    };
+
+    moveFrame = window.requestAnimationFrame(tick);
+  };
+
+  petStage.addEventListener("click", () => {
+    if (ignoreNextClick) {
+      ignoreNextClick = false;
+      return;
+    }
+    setVisible(true);
+    setControlsOpen(true);
+    playExpression("user");
+  });
+
+  petStage.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || pet.classList.contains("is-hidden")) return;
+
+    stopMove();
+    window.clearTimeout(actionTimer);
+    window.clearTimeout(expressionTimer);
+    isDragging = true;
+    ignoreNextClick = false;
+    pet.classList.add("is-dragging");
+    setState("jump");
+    petStage.setPointerCapture?.(event.pointerId);
+
+    const startPointer = { x: event.clientX, y: event.clientY };
+    const startPosition = { ...position };
+
+    const move = (moveEvent) => {
+      const dx = moveEvent.clientX - startPointer.x;
+      const dy = moveEvent.clientY - startPointer.y;
+      if (Math.hypot(dx, dy) > 6) ignoreNextClick = true;
+      position = clampPosition({
+        x: startPosition.x + dx,
+        y: startPosition.y + dy,
+      });
+      applyPosition();
+    };
+
+    const release = () => {
+      isDragging = false;
+      pet.classList.remove("is-dragging");
+      setState("idle");
+      scheduleNextAction();
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", release, { once: true });
+    window.addEventListener("pointercancel", release, { once: true });
+  });
+
+  closeButton.addEventListener("click", () => {
+    setVisible(false);
+  });
+
+  summonButton.addEventListener("click", () => {
+    const hidden = pet.classList.contains("is-hidden");
+    setVisible(true);
+    if (!hidden) {
+      setControlsOpen(true);
+      playExpression("user");
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    position = clampPosition();
+    applyPosition();
+  });
+
+  requestAnimationFrame(() => {
+    const size = getPetSize();
+    position = clampPosition({
+      x: window.innerWidth - size.width - 18,
+      y: window.innerHeight - size.height - 18,
+    });
+    applyPosition();
+  });
+
+  setState("idle");
+  setVisible(true);
+}
+
 function setupGuideFilter() {
   const search = document.querySelector("#guide-search");
   const chips = document.querySelectorAll(".filter-chip");
@@ -907,6 +1181,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCounters();
   setupInfoCards();
   setupMusicPlayer();
+  setupWebPet();
   setupGuideFilter();
   setupGuideView();
 });

@@ -100,6 +100,9 @@
         <i data-lucide="play" class="music-icon-play" aria-hidden="true"></i>
         <i data-lucide="pause" class="music-icon-pause" aria-hidden="true"></i>
       </button>
+      <button class="music-pet-toggle magnetic" type="button" data-pet-summon aria-label="召回 Cream Cat 小宠物" aria-pressed="true">
+        <i data-lucide="cat" aria-hidden="true"></i>
+      </button>
       <div class="music-meta">
         <strong>BGM</strong>
         <span data-music-title>幽冥水底</span>
@@ -116,6 +119,14 @@
         <i data-lucide="volume-2" aria-hidden="true"></i>
         <input data-music-volume type="range" min="0" max="1" step="0.01" value="0.1" aria-label="背景音乐音量" />
       </label>
+    </aside>
+
+    <aside class="web-pet" data-web-pet aria-label="Cream Cat 网页小宠物" aria-hidden="false">
+      <button class="web-pet-stage" type="button" data-pet-toggle aria-label="摸摸 Cream Cat">
+        <span class="web-pet-shadow" aria-hidden="true"></span>
+        <span class="web-pet-sprite" aria-hidden="true"></span>
+      </button>
+      <button class="web-pet-close" type="button" data-pet-close aria-label="隐藏小宠物" tabindex="-1">收起</button>
     </aside>
 
     <main id="main">

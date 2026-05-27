@@ -910,8 +910,8 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-name {
   pointer-events: none;
   position: absolute;
-  top: 1.08rem;
-  left: 78%;
+  top: -0.56rem;
+  left: 50%;
   z-index: 1;
   border: 1px solid rgba(233, 138, 167, 0.28);
   border-radius: 999px;
@@ -926,7 +926,7 @@ html[data-theme="dark"] .icon-sun {
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-10%, 0.18rem) scale(0.96);
+  transform: translate(-50%, 0.28rem) scale(0.96);
   transition:
     opacity 420ms var(--ease),
     visibility 420ms var(--ease),
@@ -937,7 +937,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet.is-name-visible .web-pet-name {
   opacity: 1;
   visibility: visible;
-  transform: translate(-10%, 0) scale(1);
+  transform: translate(-50%, 0) scale(1);
 }
 
 .web-pet.is-name-visible .web-pet-speech {

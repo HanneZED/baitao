@@ -1,7 +1,15 @@
 const root = document.documentElement;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const savedTheme = localStorage.getItem("kawaii-theme");
-root.dataset.theme = savedTheme || "light";
+let savedTheme = "light";
+try {
+  const storedTheme = localStorage.getItem("kawaii-theme");
+  if (storedTheme === "dark" || storedTheme === "light") {
+    savedTheme = storedTheme;
+  }
+} catch (error) {
+  savedTheme = root.dataset.theme === "dark" ? "dark" : "light";
+}
+root.dataset.theme = savedTheme;
 const restingCardSelector = ".work-card, .guide-card, .diary-note, .article-panel, .related-card";
 
 function clearInlineMotion(element) {
@@ -22,6 +30,38 @@ function bootIcons() {
   if (!window.lucide) return;
   window.lucide.createIcons({ attrs: { "stroke-width": 1.9 } });
   root.classList.add("icons-ready");
+}
+
+function setupPageLoader() {
+  const loader = document.querySelector("[data-page-loader]");
+  if (!loader) {
+    document.body.classList.remove("is-loading");
+    return;
+  }
+
+  const minVisibleMs = reducedMotion ? 180 : 760;
+  const startedAt = performance.now();
+  let hidden = false;
+
+  const hideLoader = () => {
+    if (hidden) return;
+    hidden = true;
+
+    const remaining = Math.max(0, minVisibleMs - (performance.now() - startedAt));
+    window.setTimeout(() => {
+      document.body.classList.remove("is-loading");
+      document.body.classList.add("is-loaded");
+      loader.setAttribute("aria-hidden", "true");
+      window.setTimeout(() => loader.remove(), reducedMotion ? 120 : 620);
+    }, remaining);
+  };
+
+  if (document.readyState === "complete") {
+    hideLoader();
+  } else {
+    window.addEventListener("load", hideLoader, { once: true });
+    window.setTimeout(hideLoader, 3600);
+  }
 }
 
 function setupThemeToggle() {
@@ -89,15 +129,50 @@ function setupChromeCompact() {
   const musicPlayer = document.querySelector("[data-music-player]");
   if (!header && !musicPlayer) return;
 
+  const lerp = (start, end, progress) => start + (end - start) * progress;
+  let ticking = false;
+
+  const syncHeader = (progress) => {
+    if (!header) return;
+
+    header.style.setProperty("--header-width", `${lerp(720, 590, progress).toFixed(2)}px`);
+    header.style.setProperty("--header-top", `${lerp(14.4, 10.4, progress).toFixed(2)}px`);
+    header.style.setProperty("--header-min-height", `${lerp(66, 54, progress).toFixed(2)}px`);
+    header.style.setProperty("--header-pad-y", `${lerp(6.72, 5.12, progress).toFixed(2)}px`);
+    header.style.setProperty("--header-pad-x", `${lerp(8.32, 6.08, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-gap", `${lerp(10.56, 8.8, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-min-height", `${lerp(48, 44, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-pad-right", `${lerp(14.4, 10.4, progress).toFixed(2)}px`);
+    header.style.setProperty("--badge-size", `${lerp(46, 40, progress).toFixed(2)}px`);
+    header.style.setProperty("--badge-shadow-blur", `${lerp(20, 16, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-title-size", `${lerp(16, 15.04, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-small-max", `${lerp(176, 0, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-small-opacity", `${lerp(1, 0, progress).toFixed(3)}`);
+    header.style.setProperty("--brand-small-y", `${lerp(0, -3, progress).toFixed(2)}px`);
+    header.style.setProperty("--brand-small-scale", `${lerp(1, 0.94, progress).toFixed(3)}`);
+    header.style.setProperty("--nav-pad-y", `${lerp(8.8, 7.36, progress).toFixed(2)}px`);
+    header.style.setProperty("--nav-pad-x", `${lerp(14.4, 11.52, progress).toFixed(2)}px`);
+    header.style.setProperty("--toggle-size", `${lerp(48, 44, progress).toFixed(2)}px`);
+  };
+
   const update = () => {
+    const progress = Math.min(1, Math.max(0, window.scrollY / 120));
     const compact = window.scrollY > 72;
-    header?.classList.toggle("is-compact", compact);
+    syncHeader(progress);
+    header?.classList.toggle("is-compact", progress > 0.92);
     musicPlayer?.classList.toggle("is-compact", compact);
+    ticking = false;
+  };
+
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
   };
 
   update();
-  window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", update);
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
 }
 
 function setupStatusCategory() {
@@ -815,6 +890,7 @@ function setupGuideView() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  setupPageLoader();
   bootIcons();
   setupThemeToggle();
   setupProgress();

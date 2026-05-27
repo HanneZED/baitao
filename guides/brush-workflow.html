@@ -15,8 +15,33 @@
       rel="stylesheet"
     />
     <script>
-      document.documentElement.classList.add("js");
+      (() => {
+        const root = document.documentElement;
+        root.classList.add("js");
+
+        try {
+          const savedTheme = localStorage.getItem("kawaii-theme");
+          if (savedTheme === "dark" || savedTheme === "light") {
+            root.dataset.theme = savedTheme;
+            document
+              .querySelector('meta[name="theme-color"]')
+              ?.setAttribute("content", savedTheme === "dark" ? "#201725" : "#fff8fb");
+          }
+        } catch (error) {
+          root.dataset.theme = "light";
+        }
+      })();
     </script>
+    <style>
+      html {
+        background: #fff8fb;
+      }
+
+      html[data-theme="dark"] {
+        background: #201725;
+        color-scheme: dark;
+      }
+    </style>
     <link rel="stylesheet" href="../styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
@@ -25,7 +50,17 @@
     <script defer src="https://unpkg.com/lucide@latest"></script>
     <script defer src="../app.js"></script>
   </head>
-  <body class="guide-page">
+  <body class="guide-page is-loading">
+    <div class="page-loader" data-page-loader role="status" aria-live="polite" aria-label="页面加载中">
+      <div class="page-loader-inner">
+        <div class="page-loader-figure" aria-hidden="true">
+          <span class="page-loader-halo"></span>
+          <img class="page-loader-gif" src="../img/loading.gif" alt="" />
+        </div>
+        <div class="page-loader-bar" aria-hidden="true"><span></span></div>
+        <p>正在把小窝整理软一点...</p>
+      </div>
+    </div>
     <div class="progress-line" aria-hidden="true"></div>
     <div class="soft-grid" aria-hidden="true"></div>
     <a class="skip-link" href="#article">跳到攻略内容</a>

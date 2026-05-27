@@ -605,6 +605,7 @@ function setupWebPet() {
   const actionDelayMaxMs = 10000;
   const moveActionChance = 0.76;
   const longMoveChance = 0.46;
+  const sillyHopChance = 0.05;
   const randomBetween = (min, max) => min + Math.random() * (max - min);
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -648,14 +649,14 @@ function setupWebPet() {
     pet.style.setProperty("--pet-row-y", `${rowY}%`);
   };
 
-  const getFrameDuration = (state, frameIndex) => {
+  const getFrameDuration = (state, frameIndex, tempo = 1) => {
     const duration = state.durations[frameIndex] || state.durations[state.durations.length - 1] || 160;
-    return duration * animationTempo;
+    return duration * animationTempo * tempo;
   };
 
-  const getStateDuration = (name) => {
+  const getStateDuration = (name, tempo = 1) => {
     const state = states[name] || states.idle;
-    return state.durations.reduce((total, duration) => total + duration, 0) * animationTempo;
+    return state.durations.reduce((total, duration) => total + duration, 0) * animationTempo * tempo;
   };
 
   const playState = (name, options = {}) => {
@@ -663,6 +664,7 @@ function setupWebPet() {
     const loop = typeof options.loop === "boolean" ? options.loop : state.loop;
     const restart = options.restart === true;
     const reverse = options.reverse === true;
+    const tempo = options.tempo || 1;
     if (!restart && activeState === name && frameTimer && loop) return;
 
     stopFrameLoop();
@@ -672,7 +674,7 @@ function setupWebPet() {
     setSpriteFrame(state, frameIndex);
 
     const queueNextFrame = () => {
-      const duration = getFrameDuration(state, frameIndex);
+      const duration = getFrameDuration(state, frameIndex, tempo);
       frameTimer = window.setTimeout(() => {
         const isLastFrame = reverse ? frameIndex <= 0 : frameIndex >= state.frames.length - 1;
         if (isLastFrame && !loop) {
@@ -735,12 +737,24 @@ function setupWebPet() {
     pet.style.bottom = "auto";
   };
 
+  const setPetFace = (direction = 1) => {
+    pet.style.setProperty("--pet-face-x", direction < 0 ? "-1" : "1");
+  };
+
+  const syncPositionFromLayout = () => {
+    const rect = pet.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    position = clampPosition({ x: rect.left, y: rect.top });
+    applyPosition();
+  };
+
   const stopMove = () => {
     if (moveFrame) {
       window.cancelAnimationFrame(moveFrame);
       moveFrame = null;
     }
     pet.classList.remove("is-walking", "is-hopping");
+    setPetFace(1);
   };
 
   const clearActionTimers = () => {
@@ -823,6 +837,7 @@ function setupWebPet() {
     setControlsOpen(false);
     playState("failed", {
       restart: true,
+      tempo: 1.72,
       onComplete: () => setSpriteFrame(states.failed, states.failed.frames.length - 1),
     });
   }
@@ -838,6 +853,7 @@ function setupWebPet() {
     playState("failed", {
       restart: true,
       reverse: true,
+      tempo: 1.36,
       onComplete: () => {
         playState("review", {
           restart: true,
@@ -883,8 +899,9 @@ function setupWebPet() {
   function walkSomewhere() {
     if (pet.classList.contains("is-hidden") || isDragging || moveFrame || isNeglected || isRecovering) return;
 
+    syncPositionFromLayout();
     const isLongMove = Math.random() < longMoveChance;
-    const minDistance = isLongMove ? 250 : 76;
+    const minDistance = isLongMove ? 300 : 116;
     const target = pickMoveTarget(isLongMove, minDistance);
     const distance = Math.hypot(target.x - position.x, target.y - position.y);
     if (distance < minDistance) {
@@ -902,12 +919,12 @@ function setupWebPet() {
   };
 
   function pickMoveTarget(isLongMove, minDistance) {
-    const maxX = isLongMove ? 620 : 360;
-    const maxY = isLongMove ? 190 : 118;
+    const maxX = isLongMove ? 660 : 390;
+    const maxY = isLongMove ? 220 : 136;
     let target = position;
     let distance = 0;
 
-    for (let attempt = 0; attempt < 8; attempt += 1) {
+    for (let attempt = 0; attempt < 12; attempt += 1) {
       target = clampPosition({
         x: position.x + randomBetween(-maxX, maxX),
         y: position.y + randomBetween(-maxY, maxY),
@@ -916,7 +933,17 @@ function setupWebPet() {
       if (distance >= minDistance) break;
     }
 
-    return target;
+    if (distance >= minDistance) return target;
+
+    const fallbackDistance = isLongMove ? 420 : 170;
+    return [
+      { x: fallbackDistance, y: randomBetween(-64, 64) },
+      { x: -fallbackDistance, y: randomBetween(-64, 64) },
+      { x: fallbackDistance * 0.72, y: fallbackDistance * 0.42 },
+      { x: -fallbackDistance * 0.72, y: -fallbackDistance * 0.42 },
+    ]
+      .map((offset) => clampPosition({ x: position.x + offset.x, y: position.y + offset.y }))
+      .sort((a, b) => Math.hypot(b.x - position.x, b.y - position.y) - Math.hypot(a.x - position.x, a.y - position.y))[0] || position;
   }
 
   function finishMove(target) {
@@ -924,6 +951,7 @@ function setupWebPet() {
     position = target;
     applyPosition();
     pet.classList.remove("is-walking", "is-hopping");
+    setPetFace(1);
     playRestState(true);
     scheduleNextAction();
   }
@@ -961,6 +989,9 @@ function setupWebPet() {
     const duration = hopCount * randomBetween(720, 860) * motionTempo;
     const arcHeight = clamp(distance * 0.16, 34, 68);
     const startedAt = performance.now();
+    const hopDirection = target.x < start.x ? -1 : 1;
+    const faceDirection = hopDirection < 0 && Math.random() < sillyHopChance ? 1 : hopDirection;
+    setPetFace(faceDirection);
     playState("jumping", { loop: true, restart: true });
     pet.classList.add("is-walking", "is-hopping");
 
@@ -1011,6 +1042,7 @@ function setupWebPet() {
 
     stopMove();
     clearActionTimers();
+    syncPositionFromLayout();
     isDragging = true;
     ignoreNextClick = false;
     pet.classList.add("is-dragging");

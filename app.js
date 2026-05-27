@@ -594,9 +594,17 @@ function setupWebPet() {
     running: { row: 7, frames: frameRange(6), durations: [160, 160, 160, 170, 170, 360], loop: false },
     review: { row: 8, frames: frameRange(6), durations: [190, 190, 190, 190, 190, 440], loop: false },
   };
-  const expressionNames = ["waving", "jumping", "failed", "waiting", "running", "review"];
-  const autoExpressionNames = ["waiting", "waiting", "waving", "review", "running", "jumping"];
+  const animationTempo = 1.28;
+  const motionTempo = 1.18;
+  const inactivityLimitMs = 180000;
+  const expressionNames = ["waving", "jumping", "waiting", "running", "review"];
+  const autoExpressionNames = ["waiting", "waiting", "waiting", "waiting", "waiting", "waiting", "review", "waving", "running", "jumping"];
+  const restStateNames = ["waiting", "waiting", "waiting", "waiting", "waiting", "waiting", "idle", "idle"];
   const interactionCooldownMs = 4200;
+  const actionDelayMinMs = 5000;
+  const actionDelayMaxMs = 10000;
+  const moveActionChance = 0.76;
+  const longMoveChance = 0.46;
   const randomBetween = (min, max) => min + Math.random() * (max - min);
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -604,11 +612,15 @@ function setupWebPet() {
   let expressionTimer = null;
   let controlTimer = null;
   let frameTimer = null;
+  let inactivityTimer = null;
   let moveFrame = null;
   let activeState = "";
   let lastExpression = "";
   let interactionReadyAt = 0;
   let isDragging = false;
+  let isNeglected = false;
+  let isRecovering = false;
+  let hasInitializedVisibility = false;
   let ignoreNextClick = false;
   let position = { x: 0, y: 0 };
 
@@ -636,37 +648,67 @@ function setupWebPet() {
     pet.style.setProperty("--pet-row-y", `${rowY}%`);
   };
 
+  const getFrameDuration = (state, frameIndex) => {
+    const duration = state.durations[frameIndex] || state.durations[state.durations.length - 1] || 160;
+    return duration * animationTempo;
+  };
+
+  const getStateDuration = (name) => {
+    const state = states[name] || states.idle;
+    return state.durations.reduce((total, duration) => total + duration, 0) * animationTempo;
+  };
+
   const playState = (name, options = {}) => {
     const state = states[name] || states.idle;
     const loop = typeof options.loop === "boolean" ? options.loop : state.loop;
     const restart = options.restart === true;
+    const reverse = options.reverse === true;
     if (!restart && activeState === name && frameTimer && loop) return;
 
     stopFrameLoop();
     activeState = name;
     pet.dataset.petState = name;
-    let frameIndex = 0;
+    let frameIndex = reverse ? state.frames.length - 1 : 0;
     setSpriteFrame(state, frameIndex);
 
     const queueNextFrame = () => {
-      const duration = state.durations[frameIndex] || state.durations[state.durations.length - 1] || 160;
+      const duration = getFrameDuration(state, frameIndex);
       frameTimer = window.setTimeout(() => {
-        const isLastFrame = frameIndex >= state.frames.length - 1;
+        const isLastFrame = reverse ? frameIndex <= 0 : frameIndex >= state.frames.length - 1;
         if (isLastFrame && !loop) {
           frameTimer = null;
           options.onComplete?.();
           return;
         }
 
-        frameIndex = isLastFrame ? 0 : frameIndex + 1;
+        frameIndex = isLastFrame ? (reverse ? state.frames.length - 1 : 0) : frameIndex + (reverse ? -1 : 1);
         setSpriteFrame(state, frameIndex);
         queueNextFrame();
       }, duration);
     };
 
-    if (!reducedMotion && state.frames.length > 1) {
+    if (reducedMotion || state.frames.length <= 1) {
+      if (!loop) {
+        setSpriteFrame(state, reverse ? 0 : state.frames.length - 1);
+        if (options.onComplete) {
+          frameTimer = window.setTimeout(() => {
+            frameTimer = null;
+            options.onComplete?.();
+          }, 0);
+        }
+      }
+      return;
+    }
+
+    if (state.frames.length > 1) {
       queueNextFrame();
     }
+  };
+
+  const playRestState = (restart = false) => {
+    if (isNeglected || isRecovering) return;
+    const nextName = restStateNames[Math.floor(Math.random() * restStateNames.length)] || "waiting";
+    playState(nextName, { loop: true, restart });
   };
 
   const getPetSize = () => {
@@ -698,28 +740,46 @@ function setupWebPet() {
       window.cancelAnimationFrame(moveFrame);
       moveFrame = null;
     }
-    pet.classList.remove("is-walking");
+    pet.classList.remove("is-walking", "is-hopping");
+  };
+
+  const clearActionTimers = () => {
+    window.clearTimeout(actionTimer);
+    window.clearTimeout(expressionTimer);
+  };
+
+  const resetInactivityTimer = () => {
+    window.clearTimeout(inactivityTimer);
+    if (pet.classList.contains("is-hidden") || isNeglected || isRecovering) return;
+    inactivityTimer = window.setTimeout(() => {
+      enterNeglectedState();
+    }, inactivityLimitMs);
+  };
+
+  const registerUserInteraction = () => {
+    if (!pet.classList.contains("is-hidden")) resetInactivityTimer();
   };
 
   const scheduleNextAction = () => {
     window.clearTimeout(actionTimer);
-    if (reducedMotion || pet.classList.contains("is-hidden")) return;
+    if (reducedMotion || isNeglected || isRecovering || pet.classList.contains("is-hidden")) return;
 
     actionTimer = window.setTimeout(() => {
-      if (isDragging || pet.classList.contains("is-hidden")) {
+      if (isDragging || isNeglected || isRecovering || pet.classList.contains("is-hidden")) {
         scheduleNextAction();
         return;
       }
 
-      if (Math.random() < 0.42) {
+      if (Math.random() < moveActionChance) {
         walkSomewhere();
       } else {
         playExpression("auto");
       }
-    }, randomBetween(10000, 20000));
+    }, randomBetween(actionDelayMinMs, actionDelayMaxMs));
   };
 
   const setVisible = (visible) => {
+    const wasHidden = pet.classList.contains("is-hidden");
     pet.classList.toggle("is-hidden", !visible);
     pet.setAttribute("aria-hidden", String(!visible));
     petStage.setAttribute("tabindex", visible ? "0" : "-1");
@@ -727,23 +787,74 @@ function setupWebPet() {
     summonButton.setAttribute("aria-label", visible ? "摸摸 Cream Cat 小宠物" : "召回 Cream Cat 小宠物");
     musicPlayer?.classList.toggle("is-pet-visible", visible);
     if (visible) {
-      playState("idle");
+      if (!wasHidden && hasInitializedVisibility) return;
+      isNeglected = false;
+      isRecovering = false;
+      playRestState();
+      resetInactivityTimer();
       scheduleNextAction();
+      hasInitializedVisibility = true;
       return;
     }
 
     stopMove();
     stopFrameLoop();
-    window.clearTimeout(actionTimer);
-    window.clearTimeout(expressionTimer);
+    clearActionTimers();
+    window.clearTimeout(inactivityTimer);
     setControlsOpen(false);
+    isNeglected = false;
+    isRecovering = false;
     activeState = "idle";
     pet.dataset.petState = "idle";
     setSpriteFrame(states.idle, 0);
   };
 
+  function enterNeglectedState() {
+    if (pet.classList.contains("is-hidden")) return;
+    if (isDragging) {
+      resetInactivityTimer();
+      return;
+    }
+
+    isNeglected = true;
+    isRecovering = false;
+    clearActionTimers();
+    stopMove();
+    setControlsOpen(false);
+    playState("failed", {
+      restart: true,
+      onComplete: () => setSpriteFrame(states.failed, states.failed.frames.length - 1),
+    });
+  }
+
+  function recoverFromNeglect() {
+    if (!isNeglected || isRecovering) return isRecovering;
+
+    isRecovering = true;
+    isNeglected = false;
+    clearActionTimers();
+    stopMove();
+    window.clearTimeout(inactivityTimer);
+    playState("failed", {
+      restart: true,
+      reverse: true,
+      onComplete: () => {
+        playState("review", {
+          restart: true,
+          onComplete: () => {
+            isRecovering = false;
+            playRestState(true);
+            resetInactivityTimer();
+            scheduleNextAction();
+          },
+        });
+      },
+    });
+    return true;
+  }
+
   const playExpression = (source = "auto") => {
-    if (pet.classList.contains("is-hidden") || isDragging || moveFrame) return false;
+    if (pet.classList.contains("is-hidden") || isDragging || moveFrame || isNeglected || isRecovering) return false;
 
     const now = Date.now();
     if (source === "user" && now < interactionReadyAt) {
@@ -753,8 +864,7 @@ function setupWebPet() {
     }
 
     if (source === "user") interactionReadyAt = now + interactionCooldownMs;
-    window.clearTimeout(expressionTimer);
-    window.clearTimeout(actionTimer);
+    clearActionTimers();
 
     const pool = source === "auto" ? autoExpressionNames : expressionNames;
     const candidates = pool.filter((name) => name !== lastExpression);
@@ -763,30 +873,64 @@ function setupWebPet() {
     playState(nextName, { restart: true });
 
     expressionTimer = window.setTimeout(() => {
-      playState("idle", { restart: true });
+      playRestState(true);
       scheduleNextAction();
-    }, states[nextName].durations.reduce((total, duration) => total + duration, 0) + 420);
+    }, getStateDuration(nextName) + 540);
 
     return true;
   };
 
   function walkSomewhere() {
-    if (pet.classList.contains("is-hidden") || isDragging || moveFrame) return;
+    if (pet.classList.contains("is-hidden") || isDragging || moveFrame || isNeglected || isRecovering) return;
 
-    const target = clampPosition({
-      x: position.x + randomBetween(-180, 180),
-      y: position.y + randomBetween(-74, 58),
-    });
+    const isLongMove = Math.random() < longMoveChance;
+    const minDistance = isLongMove ? 250 : 76;
+    const target = pickMoveTarget(isLongMove, minDistance);
     const distance = Math.hypot(target.x - position.x, target.y - position.y);
-    if (distance < 46) {
+    if (distance < minDistance) {
       scheduleNextAction();
       return;
     }
 
-    window.clearTimeout(actionTimer);
-    window.clearTimeout(expressionTimer);
+    clearActionTimers();
+    if (isLongMove) {
+      hopSomewhere(target, distance);
+      return;
+    }
+
+    walkShortDistance(target, distance);
+  };
+
+  function pickMoveTarget(isLongMove, minDistance) {
+    const maxX = isLongMove ? 620 : 360;
+    const maxY = isLongMove ? 190 : 118;
+    let target = position;
+    let distance = 0;
+
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      target = clampPosition({
+        x: position.x + randomBetween(-maxX, maxX),
+        y: position.y + randomBetween(-maxY, maxY),
+      });
+      distance = Math.hypot(target.x - position.x, target.y - position.y);
+      if (distance >= minDistance) break;
+    }
+
+    return target;
+  }
+
+  function finishMove(target) {
+    moveFrame = null;
+    position = target;
+    applyPosition();
+    pet.classList.remove("is-walking", "is-hopping");
+    playRestState(true);
+    scheduleNextAction();
+  }
+
+  function walkShortDistance(target, distance) {
     const start = { ...position };
-    const duration = clamp(distance * 13.5, 1800, 3700);
+    const duration = clamp(distance * 15.8 * motionTempo, 2100, 4300);
     const startedAt = performance.now();
     playState(target.x >= start.x ? "runningRight" : "runningLeft", { restart: true });
     pet.classList.add("is-walking");
@@ -805,16 +949,42 @@ function setupWebPet() {
         return;
       }
 
-      moveFrame = null;
-      position = target;
-      applyPosition();
-      pet.classList.remove("is-walking");
-      playState("idle", { restart: true });
-      scheduleNextAction();
+      finishMove(target);
     };
 
     moveFrame = window.requestAnimationFrame(tick);
-  };
+  }
+
+  function hopSomewhere(target, distance) {
+    const start = { ...position };
+    const hopCount = Math.round(clamp(distance / 145, 2, 6));
+    const duration = hopCount * randomBetween(720, 860) * motionTempo;
+    const arcHeight = clamp(distance * 0.16, 34, 68);
+    const startedAt = performance.now();
+    playState("jumping", { loop: true, restart: true });
+    pet.classList.add("is-walking", "is-hopping");
+
+    const tick = (now) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      const hopProgress = Math.min((progress * hopCount) % 1, 1);
+      const lift = 4 * hopProgress * (1 - hopProgress) * arcHeight;
+      position = {
+        x: start.x + (target.x - start.x) * eased,
+        y: Math.max(8, start.y + (target.y - start.y) * eased - lift),
+      };
+      applyPosition();
+
+      if (progress < 1) {
+        moveFrame = window.requestAnimationFrame(tick);
+        return;
+      }
+
+      finishMove(target);
+    };
+
+    moveFrame = window.requestAnimationFrame(tick);
+  }
 
   petStage.addEventListener("click", () => {
     if (ignoreNextClick) {
@@ -823,15 +993,24 @@ function setupWebPet() {
     }
     setVisible(true);
     setControlsOpen(true);
+    registerUserInteraction();
+    if (recoverFromNeglect()) return;
     playExpression("user");
   });
 
   petStage.addEventListener("pointerdown", (event) => {
     if (event.button !== 0 || pet.classList.contains("is-hidden")) return;
 
+    registerUserInteraction();
+    if (isNeglected) {
+      ignoreNextClick = true;
+      setControlsOpen(true);
+      recoverFromNeglect();
+      return;
+    }
+
     stopMove();
-    window.clearTimeout(actionTimer);
-    window.clearTimeout(expressionTimer);
+    clearActionTimers();
     isDragging = true;
     ignoreNextClick = false;
     pet.classList.add("is-dragging");
@@ -855,7 +1034,8 @@ function setupWebPet() {
     const release = () => {
       isDragging = false;
       pet.classList.remove("is-dragging");
-      playState("idle", { restart: true });
+      playRestState(true);
+      resetInactivityTimer();
       scheduleNextAction();
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", release);
@@ -868,12 +1048,15 @@ function setupWebPet() {
   });
 
   closeButton.addEventListener("click", () => {
+    registerUserInteraction();
     setVisible(false);
   });
 
   summonButton.addEventListener("click", () => {
     const hidden = pet.classList.contains("is-hidden");
     setVisible(true);
+    registerUserInteraction();
+    if (recoverFromNeglect()) return;
     if (!hidden) {
       setControlsOpen(true);
       playExpression("user");
@@ -894,7 +1077,6 @@ function setupWebPet() {
     applyPosition();
   });
 
-  playState("idle", { restart: true });
   setVisible(true);
 }
 

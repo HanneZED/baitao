@@ -569,6 +569,121 @@ function setupMusicPlayer() {
     localStorage.setItem("kawaii-bgm-volume", audio.volume.toString());
   });
 
+  const getPlayerSize = () => {
+    const rect = player.getBoundingClientRect();
+    return {
+      width: rect.width || 116,
+      height: rect.height || 56,
+    };
+  };
+
+  const clampPlayerPosition = (nextPosition) => {
+    const size = getPlayerSize();
+    const margin = window.innerWidth < 760 ? 12 : 16;
+    return {
+      x: Math.min(Math.max(nextPosition.x, margin), Math.max(margin, window.innerWidth - size.width - margin)),
+      y: Math.min(Math.max(nextPosition.y, margin), Math.max(margin, window.innerHeight - size.height - margin)),
+    };
+  };
+
+  const applyPlayerPosition = (position) => {
+    player.style.left = `${position.x}px`;
+    player.style.top = `${position.y}px`;
+    player.style.right = "auto";
+    player.style.bottom = "auto";
+  };
+
+  const snapPlayerToSide = (position) => {
+    const size = getPlayerSize();
+    const margin = window.innerWidth < 760 ? 12 : 16;
+    const snapLeft = position.x + size.width / 2 < window.innerWidth / 2;
+    const snapped = clampPlayerPosition({
+      x: snapLeft ? margin : window.innerWidth - size.width - margin,
+      y: position.y,
+    });
+    applyPlayerPosition(snapped);
+    localStorage.setItem("kawaii-bgm-player-position", JSON.stringify(snapped));
+  };
+
+  const restorePlayerPosition = () => {
+    const rawPosition = localStorage.getItem("kawaii-bgm-player-position");
+    if (!rawPosition) return;
+    try {
+      const savedPosition = JSON.parse(rawPosition);
+      if (!Number.isFinite(savedPosition.x) || !Number.isFinite(savedPosition.y)) return;
+      snapPlayerToSide(clampPlayerPosition(savedPosition));
+    } catch {
+      localStorage.removeItem("kawaii-bgm-player-position");
+    }
+  };
+
+  let musicDragStart = null;
+  let musicDragPosition = null;
+  let musicDidDrag = false;
+  let suppressMusicClick = false;
+
+  player.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || event.target.closest("input")) return;
+
+    const rect = player.getBoundingClientRect();
+    musicDragStart = { x: event.clientX, y: event.clientY };
+    musicDragPosition = { x: rect.left, y: rect.top };
+    musicDidDrag = false;
+    player.setPointerCapture?.(event.pointerId);
+    player.classList.add("is-dragging");
+
+    const move = (moveEvent) => {
+      if (!musicDragStart || !musicDragPosition) return;
+      const dx = moveEvent.clientX - musicDragStart.x;
+      const dy = moveEvent.clientY - musicDragStart.y;
+      if (Math.hypot(dx, dy) > 6) musicDidDrag = true;
+      if (!musicDidDrag) return;
+      applyPlayerPosition(clampPlayerPosition({
+        x: musicDragPosition.x + dx,
+        y: musicDragPosition.y + dy,
+      }));
+    };
+
+    const release = () => {
+      player.classList.remove("is-dragging");
+      if (musicDidDrag) {
+        suppressMusicClick = true;
+        const rectAfterDrag = player.getBoundingClientRect();
+        snapPlayerToSide({ x: rectAfterDrag.left, y: rectAfterDrag.top });
+        window.setTimeout(() => {
+          suppressMusicClick = false;
+        }, 0);
+      }
+      musicDragStart = null;
+      musicDragPosition = null;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", release, { once: true });
+    window.addEventListener("pointercancel", release, { once: true });
+  });
+
+  player.addEventListener(
+    "click",
+    (event) => {
+      if (!suppressMusicClick) return;
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    true,
+  );
+
+  window.addEventListener("resize", () => {
+    if (!player.style.left || !player.style.top) return;
+    const rect = player.getBoundingClientRect();
+    snapPlayerToSide({ x: rect.left, y: rect.top });
+  });
+
+  requestAnimationFrame(restorePlayerPosition);
+
   audio.addEventListener("ended", () => switchTrack(1));
   audio.addEventListener("play", syncPlayingState);
   audio.addEventListener("pause", syncPlayingState);
@@ -577,6 +692,7 @@ function setupMusicPlayer() {
 function setupWebPet() {
   const pet = document.querySelector("[data-web-pet]");
   const petStage = document.querySelector("[data-pet-toggle]");
+  const petSpeech = document.querySelector("[data-pet-speech]");
   const closeButton = document.querySelector("[data-pet-close]");
   const summonButton = document.querySelector("[data-pet-summon]");
   const musicPlayer = document.querySelector("[data-music-player]");
@@ -614,6 +730,8 @@ function setupWebPet() {
   let controlTimer = null;
   let frameTimer = null;
   let inactivityTimer = null;
+  let nameTimer = null;
+  let speechTimer = null;
   let moveFrame = null;
   let activeState = "";
   let lastExpression = "";
@@ -632,6 +750,42 @@ function setupWebPet() {
     if (open) {
       controlTimer = window.setTimeout(() => setControlsOpen(false), 9000);
     }
+  };
+
+  const showPetName = () => {
+    window.clearTimeout(nameTimer);
+    pet.classList.add("is-name-visible");
+    nameTimer = window.setTimeout(() => {
+      pet.classList.remove("is-name-visible");
+    }, 6000);
+  };
+
+  const sayPet = (text, tone = "meow", visibleMs = 2300) => {
+    if (!petSpeech) return;
+    window.clearTimeout(speechTimer);
+    petSpeech.textContent = text;
+    petSpeech.className = "web-pet-speech";
+    petSpeech.setAttribute("aria-hidden", "false");
+    petSpeech.getBoundingClientRect();
+    petSpeech.classList.add("is-visible", `is-${tone}`);
+    speechTimer = window.setTimeout(() => {
+      petSpeech.classList.remove("is-visible");
+      window.setTimeout(() => {
+        if (petSpeech.classList.contains("is-visible")) return;
+        petSpeech.setAttribute("aria-hidden", "true");
+        petSpeech.textContent = "";
+      }, 260);
+    }, visibleMs);
+  };
+
+  const hidePetHints = () => {
+    window.clearTimeout(nameTimer);
+    window.clearTimeout(speechTimer);
+    pet.classList.remove("is-name-visible");
+    if (!petSpeech) return;
+    petSpeech.className = "web-pet-speech";
+    petSpeech.setAttribute("aria-hidden", "true");
+    petSpeech.textContent = "";
   };
 
   const stopFrameLoop = () => {
@@ -815,6 +969,7 @@ function setupWebPet() {
     stopFrameLoop();
     clearActionTimers();
     window.clearTimeout(inactivityTimer);
+    hidePetHints();
     setControlsOpen(false);
     isNeglected = false;
     isRecovering = false;
@@ -835,6 +990,7 @@ function setupWebPet() {
     clearActionTimers();
     stopMove();
     setControlsOpen(false);
+    sayPet("呜呜~", "sad", 3600);
     playState("failed", {
       restart: true,
       tempo: 1.72,
@@ -887,6 +1043,9 @@ function setupWebPet() {
     const nextName = candidates[Math.floor(Math.random() * candidates.length)] || "waving";
     lastExpression = nextName;
     playState(nextName, { restart: true });
+    if (source === "auto" && nextName === "jumping") {
+      sayPet("咿呀~~~哈！", "hop");
+    }
 
     expressionTimer = window.setTimeout(() => {
       playRestState(true);
@@ -990,8 +1149,10 @@ function setupWebPet() {
     const arcHeight = clamp(distance * 0.16, 34, 68);
     const startedAt = performance.now();
     const hopDirection = target.x < start.x ? -1 : 1;
-    const faceDirection = hopDirection < 0 && Math.random() < sillyHopChance ? 1 : hopDirection;
+    const isSillyHop = hopDirection < 0 && Math.random() < sillyHopChance;
+    const faceDirection = isSillyHop ? 1 : hopDirection;
     setPetFace(faceDirection);
+    sayPet(isSillyHop ? "喵呜~~！" : "咿呀~~~哈！", isSillyHop ? "silly" : "hop", Math.min(duration + 520, 3900));
     playState("jumping", { loop: true, restart: true });
     pet.classList.add("is-walking", "is-hopping");
 
@@ -1024,6 +1185,8 @@ function setupWebPet() {
     }
     setVisible(true);
     setControlsOpen(true);
+    showPetName();
+    sayPet("喵~喵~", "meow");
     registerUserInteraction();
     if (recoverFromNeglect()) return;
     playExpression("user");

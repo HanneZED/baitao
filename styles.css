@@ -572,6 +572,7 @@ html[data-theme="dark"] .icon-sun {
 }
 
 .music-player {
+  --music-compact-width: 116px;
   position: fixed;
   left: 1rem;
   right: auto;
@@ -597,6 +598,7 @@ html[data-theme="dark"] .icon-sun {
     background 260ms var(--ease),
     box-shadow 260ms var(--ease),
     left 280ms var(--ease-pop),
+    right 280ms var(--ease-pop),
     top 280ms var(--ease-pop);
 }
 
@@ -612,7 +614,7 @@ html[data-theme="dark"] .icon-sun {
 .music-player.is-compact:not(:hover):not(:focus-within) {
   grid-template-columns: 46px 46px 0 0 0;
   gap: 0.38rem;
-  width: 116px;
+  width: var(--music-compact-width);
   padding: 0.45rem 0.5rem;
   background: rgba(255, 254, 251, 0.92);
   box-shadow: 0 12px 34px rgba(132, 92, 82, 0.12);
@@ -809,12 +811,12 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech {
   pointer-events: none;
   position: absolute;
-  top: -3.05rem;
-  left: 50%;
+  top: -3.62rem;
+  left: 72%;
   z-index: 2;
   max-width: 9.5rem;
   border: 1px solid rgba(233, 138, 167, 0.3);
-  border-radius: 999px 999px 999px 8px;
+  border-radius: 999px 999px 999px 10px;
   padding: 0.34rem 0.72rem;
   background: rgba(255, 254, 251, 0.9);
   box-shadow: 0 14px 30px rgba(132, 92, 82, 0.12);
@@ -827,7 +829,7 @@ html[data-theme="dark"] .icon-sun {
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 0.42rem) scale(0.94);
+  transform: translate(-50%, 0.42rem) rotate(-4deg) scale(0.94);
   transition:
     opacity 240ms var(--ease),
     visibility 240ms var(--ease),
@@ -838,7 +840,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech::after {
   content: "";
   position: absolute;
-  left: 50%;
+  left: 28%;
   bottom: -0.28rem;
   width: 0.52rem;
   height: 0.52rem;
@@ -851,7 +853,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech.is-visible {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(-50%, 0) rotate(-4deg) scale(1);
   animation: pet-speech-pop 520ms var(--ease-pop);
 }
 
@@ -1048,56 +1050,56 @@ html[data-theme="dark"] .web-pet-close {
 
 @keyframes pet-speech-pop {
   0% {
-    transform: translate(-50%, 0.42rem) scale(0.9);
+    transform: translate(-50%, 0.42rem) rotate(-4deg) scale(0.9);
   }
 
   68% {
-    transform: translate(-50%, -0.08rem) scale(1.04);
+    transform: translate(-50%, -0.08rem) rotate(-4deg) scale(1.04);
   }
 
   100% {
-    transform: translate(-50%, 0) scale(1);
+    transform: translate(-50%, 0) rotate(-4deg) scale(1);
   }
 }
 
 @keyframes pet-speech-hop {
   0%,
   100% {
-    transform: translate(-50%, 0) rotate(0deg) scale(1);
+    transform: translate(-50%, 0) rotate(-4deg) scale(1);
   }
 
   34% {
-    transform: translate(-50%, -0.18rem) rotate(-2deg) scale(1.04);
+    transform: translate(-50%, -0.18rem) rotate(-7deg) scale(1.04);
   }
 
   68% {
-    transform: translate(-50%, -0.04rem) rotate(2deg) scale(1.02);
+    transform: translate(-50%, -0.04rem) rotate(-1deg) scale(1.02);
   }
 }
 
 @keyframes pet-speech-silly {
   0%,
   100% {
-    transform: translate(-50%, 0) rotate(0deg) scale(1);
+    transform: translate(-50%, 0) rotate(-4deg) scale(1);
   }
 
   28% {
-    transform: translate(calc(-50% - 0.16rem), -0.1rem) rotate(-4deg) scale(1.03);
+    transform: translate(calc(-50% - 0.16rem), -0.1rem) rotate(-9deg) scale(1.03);
   }
 
   62% {
-    transform: translate(calc(-50% + 0.18rem), 0.02rem) rotate(3deg) scale(1.01);
+    transform: translate(calc(-50% + 0.18rem), 0.02rem) rotate(1deg) scale(1.01);
   }
 }
 
 @keyframes pet-speech-sad {
   0% {
-    transform: translate(-50%, 0.14rem) scale(0.96);
+    transform: translate(-50%, 0.14rem) rotate(-4deg) scale(0.96);
   }
 
   45%,
   100% {
-    transform: translate(-50%, 0) scale(1);
+    transform: translate(-50%, 0) rotate(-4deg) scale(1);
   }
 }
 
@@ -1273,7 +1275,7 @@ html[data-theme="dark"] .web-pet-close {
 
 .card-ribbon {
   position: absolute;
-  top: 0.95rem;
+  top: 0.48rem;
   right: 1rem;
   z-index: 2;
   border: 1px solid var(--line-strong);
@@ -2617,13 +2619,14 @@ html[data-theme="dark"] .guide-view-shell {
 
 @media (max-width: 520px) {
   .music-player {
+    --music-compact-width: 106px;
     grid-template-columns: 42px 42px minmax(0, 1fr) auto;
     gap: 0.42rem;
   }
 
   .music-player.is-compact:not(:hover):not(:focus-within) {
     grid-template-columns: 42px 42px 0 0;
-    width: 106px;
+    width: var(--music-compact-width);
   }
 
   .music-toggle,

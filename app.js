@@ -577,32 +577,56 @@ function setupMusicPlayer() {
     };
   };
 
+  const getPlayerMargin = () => (window.innerWidth < 760 ? 12 : 16);
+
   const clampPlayerPosition = (nextPosition) => {
     const size = getPlayerSize();
-    const margin = window.innerWidth < 760 ? 12 : 16;
+    const margin = getPlayerMargin();
     return {
       x: Math.min(Math.max(nextPosition.x, margin), Math.max(margin, window.innerWidth - size.width - margin)),
       y: Math.min(Math.max(nextPosition.y, margin), Math.max(margin, window.innerHeight - size.height - margin)),
     };
   };
 
-  const applyPlayerPosition = (position) => {
+  const getClampedPlayerY = (y) => {
+    const size = getPlayerSize();
+    const margin = getPlayerMargin();
+    return Math.min(Math.max(y, margin), Math.max(margin, window.innerHeight - size.height - margin));
+  };
+
+  const applyPlayerPosition = (position, side = null) => {
+    const margin = getPlayerMargin();
+    const y = getClampedPlayerY(position.y);
+    player.dataset.snapSide = side || "";
     player.style.left = `${position.x}px`;
-    player.style.top = `${position.y}px`;
-    player.style.right = "auto";
+    player.style.top = `${y}px`;
+    player.style.right = side === "right" ? `${margin}px` : "auto";
     player.style.bottom = "auto";
+  };
+
+  const applySnappedPlayerPosition = ({ side, y }) => {
+    const margin = getPlayerMargin();
+    const snappedY = getClampedPlayerY(y);
+    player.dataset.snapSide = side;
+    player.style.top = `${snappedY}px`;
+    player.style.bottom = "auto";
+    if (side === "right") {
+      player.style.left = "auto";
+      player.style.right = `${margin}px`;
+    } else {
+      player.style.left = `${margin}px`;
+      player.style.right = "auto";
+    }
+    localStorage.setItem("kawaii-bgm-player-position", JSON.stringify({ side, y: snappedY }));
   };
 
   const snapPlayerToSide = (position) => {
     const size = getPlayerSize();
-    const margin = window.innerWidth < 760 ? 12 : 16;
     const snapLeft = position.x + size.width / 2 < window.innerWidth / 2;
-    const snapped = clampPlayerPosition({
-      x: snapLeft ? margin : window.innerWidth - size.width - margin,
+    applySnappedPlayerPosition({
+      side: snapLeft ? "left" : "right",
       y: position.y,
     });
-    applyPlayerPosition(snapped);
-    localStorage.setItem("kawaii-bgm-player-position", JSON.stringify(snapped));
   };
 
   const restorePlayerPosition = () => {
@@ -610,7 +634,12 @@ function setupMusicPlayer() {
     if (!rawPosition) return;
     try {
       const savedPosition = JSON.parse(rawPosition);
-      if (!Number.isFinite(savedPosition.x) || !Number.isFinite(savedPosition.y)) return;
+      if (!Number.isFinite(savedPosition.y)) return;
+      if (savedPosition.side === "left" || savedPosition.side === "right") {
+        applySnappedPlayerPosition(savedPosition);
+        return;
+      }
+      if (!Number.isFinite(savedPosition.x)) return;
       snapPlayerToSide(clampPlayerPosition(savedPosition));
     } catch {
       localStorage.removeItem("kawaii-bgm-player-position");
@@ -638,6 +667,7 @@ function setupMusicPlayer() {
       const dy = moveEvent.clientY - musicDragStart.y;
       if (Math.hypot(dx, dy) > 6) musicDidDrag = true;
       if (!musicDidDrag) return;
+      player.dataset.snapSide = "";
       applyPlayerPosition(clampPlayerPosition({
         x: musicDragPosition.x + dx,
         y: musicDragPosition.y + dy,
@@ -677,7 +707,14 @@ function setupMusicPlayer() {
   );
 
   window.addEventListener("resize", () => {
-    if (!player.style.left || !player.style.top) return;
+    if (!player.style.top) return;
+    if (player.dataset.snapSide === "left" || player.dataset.snapSide === "right") {
+      applySnappedPlayerPosition({
+        side: player.dataset.snapSide,
+        y: player.getBoundingClientRect().top,
+      });
+      return;
+    }
     const rect = player.getBoundingClientRect();
     snapPlayerToSide({ x: rect.left, y: rect.top });
   });

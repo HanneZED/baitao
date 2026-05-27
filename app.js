@@ -652,7 +652,7 @@ function setupMusicPlayer() {
   let suppressMusicClick = false;
 
   player.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || event.target.closest("input")) return;
+    if (event.button !== 0 || event.target.closest("button, input, a, label")) return;
 
     const rect = player.getBoundingClientRect();
     musicDragStart = { x: event.clientX, y: event.clientY };

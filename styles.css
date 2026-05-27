@@ -628,6 +628,34 @@ html[data-theme="dark"] .icon-sun {
   opacity: 0;
 }
 
+.music-player[data-snap-side="right"] {
+  grid-template-columns: 116px auto minmax(0, 1fr) 46px 46px;
+}
+
+.music-player[data-snap-side="right"] .music-volume {
+  order: 1;
+}
+
+.music-player[data-snap-side="right"] .music-skip {
+  order: 2;
+}
+
+.music-player[data-snap-side="right"] .music-meta {
+  order: 3;
+}
+
+.music-player[data-snap-side="right"] .music-pet-toggle {
+  order: 4;
+}
+
+.music-player[data-snap-side="right"] .music-toggle {
+  order: 5;
+}
+
+.music-player[data-snap-side="right"].is-compact:not(:hover):not(:focus-within) {
+  grid-template-columns: 0 0 0 46px 46px;
+}
+
 .music-meta,
 .music-skip,
 .music-volume {
@@ -809,6 +837,13 @@ html[data-theme="dark"] .icon-sun {
 }
 
 .web-pet-speech {
+  --speech-x: -50%;
+  --speech-y: 0px;
+  --speech-enter-y: 0.32rem;
+  --speech-pop-y: -0.08rem;
+  --speech-hop-y: -0.18rem;
+  --speech-silly-x: 0.16rem;
+  --speech-rotate: -3deg;
   pointer-events: none;
   position: absolute;
   top: -1.45rem;
@@ -829,7 +864,7 @@ html[data-theme="dark"] .icon-sun {
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 0.32rem) rotate(-3deg) scale(0.94);
+  transform: translate(var(--speech-x), var(--speech-enter-y)) rotate(var(--speech-rotate)) scale(0.94);
   transition:
     opacity 240ms var(--ease),
     visibility 240ms var(--ease),
@@ -853,7 +888,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech.is-visible {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0) rotate(-3deg) scale(1);
+  transform: translate(var(--speech-x), var(--speech-y)) rotate(var(--speech-rotate)) scale(1);
   animation: pet-speech-pop 520ms var(--ease-pop);
 }
 
@@ -903,6 +938,22 @@ html[data-theme="dark"] .icon-sun {
   opacity: 1;
   visibility: visible;
   transform: translate(-10%, 0) scale(1);
+}
+
+.web-pet.is-name-visible .web-pet-speech {
+  --speech-x: 0px;
+  --speech-y: 0px;
+  --speech-enter-y: 0.22rem;
+  --speech-pop-y: -0.06rem;
+  --speech-hop-y: -0.14rem;
+  --speech-silly-x: 0.14rem;
+  --speech-rotate: -2deg;
+  top: 0.08rem;
+  left: calc(100% - 0.1rem);
+}
+
+.web-pet.is-name-visible .web-pet-speech::after {
+  left: 0.78rem;
 }
 
 .web-pet-stage:hover {
@@ -1050,56 +1101,56 @@ html[data-theme="dark"] .web-pet-close {
 
 @keyframes pet-speech-pop {
   0% {
-    transform: translate(-50%, 0.32rem) rotate(-3deg) scale(0.9);
+    transform: translate(var(--speech-x), var(--speech-enter-y)) rotate(var(--speech-rotate)) scale(0.9);
   }
 
   68% {
-    transform: translate(-50%, -0.08rem) rotate(-3deg) scale(1.04);
+    transform: translate(var(--speech-x), var(--speech-pop-y)) rotate(var(--speech-rotate)) scale(1.04);
   }
 
   100% {
-    transform: translate(-50%, 0) rotate(-3deg) scale(1);
+    transform: translate(var(--speech-x), var(--speech-y)) rotate(var(--speech-rotate)) scale(1);
   }
 }
 
 @keyframes pet-speech-hop {
   0%,
   100% {
-    transform: translate(-50%, 0) rotate(-3deg) scale(1);
+    transform: translate(var(--speech-x), var(--speech-y)) rotate(var(--speech-rotate)) scale(1);
   }
 
   34% {
-    transform: translate(-50%, -0.18rem) rotate(-6deg) scale(1.04);
+    transform: translate(var(--speech-x), var(--speech-hop-y)) rotate(calc(var(--speech-rotate) - 3deg)) scale(1.04);
   }
 
   68% {
-    transform: translate(-50%, -0.04rem) rotate(0deg) scale(1.02);
+    transform: translate(var(--speech-x), var(--speech-pop-y)) rotate(calc(var(--speech-rotate) + 3deg)) scale(1.02);
   }
 }
 
 @keyframes pet-speech-silly {
   0%,
   100% {
-    transform: translate(-50%, 0) rotate(-3deg) scale(1);
+    transform: translate(var(--speech-x), var(--speech-y)) rotate(var(--speech-rotate)) scale(1);
   }
 
   28% {
-    transform: translate(calc(-50% - 0.16rem), -0.1rem) rotate(-8deg) scale(1.03);
+    transform: translate(calc(var(--speech-x) - var(--speech-silly-x)), var(--speech-pop-y)) rotate(calc(var(--speech-rotate) - 5deg)) scale(1.03);
   }
 
   62% {
-    transform: translate(calc(-50% + 0.18rem), 0.02rem) rotate(2deg) scale(1.01);
+    transform: translate(calc(var(--speech-x) + var(--speech-silly-x)), var(--speech-y)) rotate(calc(var(--speech-rotate) + 5deg)) scale(1.01);
   }
 }
 
 @keyframes pet-speech-sad {
   0% {
-    transform: translate(-50%, 0.14rem) rotate(-3deg) scale(0.96);
+    transform: translate(var(--speech-x), var(--speech-enter-y)) rotate(var(--speech-rotate)) scale(0.96);
   }
 
   45%,
   100% {
-    transform: translate(-50%, 0) rotate(-3deg) scale(1);
+    transform: translate(var(--speech-x), var(--speech-y)) rotate(var(--speech-rotate)) scale(1);
   }
 }
 
@@ -2624,9 +2675,21 @@ html[data-theme="dark"] .guide-view-shell {
     gap: 0.42rem;
   }
 
+  .music-player[data-snap-side="right"] {
+    grid-template-columns: auto minmax(0, 1fr) 42px 42px;
+  }
+
+  .music-player[data-snap-side="right"].is-compact:not(:hover):not(:focus-within) {
+    grid-template-columns: 0 0 42px 42px;
+  }
+
   .music-player.is-compact:not(:hover):not(:focus-within) {
     grid-template-columns: 42px 42px 0 0;
     width: var(--music-compact-width);
+  }
+
+  .music-player[data-snap-side="right"].is-compact:not(:hover):not(:focus-within) {
+    grid-template-columns: 0 0 42px 42px;
   }
 
   .music-toggle,

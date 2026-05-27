@@ -488,116 +488,6 @@ function setupCounters() {
   counters.forEach((counter) => observer.observe(counter));
 }
 
-function setupInfoCards() {
-  const timeEl = document.querySelector("[data-live-time]");
-  const dateEl = document.querySelector("[data-live-date]");
-  const weatherEl = document.querySelector("[data-live-weather]");
-
-  const updateClock = () => {
-    const now = new Date();
-    if (timeEl) {
-      timeEl.textContent = now.toLocaleTimeString("zh-CN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    if (dateEl) {
-      dateEl.textContent = now.toLocaleDateString("zh-CN", {
-        month: "2-digit",
-        day: "2-digit",
-        weekday: "short",
-      });
-    }
-  };
-
-  updateClock();
-  window.setInterval(updateClock, 1000);
-
-  if (!weatherEl) return;
-
-  const weatherNames = {
-    0: "晴",
-    1: "微晴",
-    2: "多云",
-    3: "阴",
-    45: "雾",
-    48: "雾",
-    51: "小雨",
-    53: "小雨",
-    55: "小雨",
-    61: "下雨",
-    63: "下雨",
-    65: "大雨",
-    71: "小雪",
-    73: "下雪",
-    75: "大雪",
-    80: "阵雨",
-    81: "阵雨",
-    82: "阵雨",
-    95: "雷雨",
-    96: "雷雨",
-    99: "雷雨",
-  };
-
-  const defaultWeatherPlace = {
-    label: "上海",
-    latitude: 31.2304,
-    longitude: 121.4737,
-  };
-
-  const setUnavailable = () => {
-    weatherEl.textContent = "天气暂缺";
-    weatherEl.title = "天气接口暂时不可用，请稍后刷新。";
-  };
-
-  const loadWeather = async ({ label, latitude, longitude }) => {
-    if (!window.fetch) {
-      setUnavailable();
-      return;
-    }
-
-    try {
-      const params = new URLSearchParams({
-        latitude: latitude.toFixed(4),
-        longitude: longitude.toFixed(4),
-        current: "temperature_2m,weather_code",
-        timezone: "auto",
-      });
-      const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
-      if (!response.ok) throw new Error("weather unavailable");
-
-      const data = await response.json();
-      const temp = Number(data.current?.temperature_2m);
-      const code = Number(data.current?.weather_code);
-      if (!Number.isFinite(temp)) throw new Error("weather missing");
-
-      weatherEl.textContent = `${label} ${weatherNames[code] || "天气"} ${Math.round(temp)}°`;
-      weatherEl.title =
-        label === "附近"
-          ? "根据浏览器定位获取的实时天气。"
-          : "浏览器未提供定位时，默认显示上海天气。";
-    } catch {
-      setUnavailable();
-    }
-  };
-
-  const loadDefaultWeather = () => loadWeather(defaultWeatherPlace);
-
-  if (!navigator.geolocation) {
-    loadDefaultWeather();
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const { latitude, longitude } = position.coords;
-      loadWeather({ label: "附近", latitude, longitude });
-    },
-    loadDefaultWeather,
-    { timeout: 4200, maximumAge: 1000 * 60 * 30 },
-  );
-}
-
 function setupMusicPlayer() {
   const player = document.querySelector("[data-music-player]");
   const audio = document.querySelector("[data-music-audio]");
@@ -694,7 +584,7 @@ function setupWebPet() {
 
   const frameRange = (count) => Array.from({ length: count }, (_, index) => index);
   const states = {
-    idle: { row: 0, frames: frameRange(6), durations: [620, 180, 180, 1120, 260, 760], loop: true },
+    idle: { row: 0, frames: frameRange(6), durations: [620, 180, 180, 5000, 260, 760], loop: true },
     runningRight: { row: 1, frames: frameRange(8), durations: [150, 150, 150, 150, 150, 150, 150, 280], loop: true },
     runningLeft: { row: 2, frames: frameRange(8), durations: [150, 150, 150, 150, 150, 150, 150, 280], loop: true },
     waving: { row: 3, frames: frameRange(4), durations: [190, 190, 210, 430], loop: false },
@@ -705,6 +595,7 @@ function setupWebPet() {
     review: { row: 8, frames: frameRange(6), durations: [190, 190, 190, 190, 190, 440], loop: false },
   };
   const expressionNames = ["waving", "jumping", "failed", "waiting", "running", "review"];
+  const autoExpressionNames = ["waiting", "waiting", "waving", "review", "running", "jumping"];
   const interactionCooldownMs = 4200;
   const randomBetween = (min, max) => min + Math.random() * (max - min);
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -820,12 +711,12 @@ function setupWebPet() {
         return;
       }
 
-      if (Math.random() < 0.62) {
+      if (Math.random() < 0.42) {
         walkSomewhere();
       } else {
         playExpression("auto");
       }
-    }, randomBetween(11800, 22000));
+    }, randomBetween(10000, 20000));
   };
 
   const setVisible = (visible) => {
@@ -865,7 +756,8 @@ function setupWebPet() {
     window.clearTimeout(expressionTimer);
     window.clearTimeout(actionTimer);
 
-    const candidates = expressionNames.filter((name) => name !== lastExpression);
+    const pool = source === "auto" ? autoExpressionNames : expressionNames;
+    const candidates = pool.filter((name) => name !== lastExpression);
     const nextName = candidates[Math.floor(Math.random() * candidates.length)] || "waving";
     lastExpression = nextName;
     playState(nextName, { restart: true });
@@ -1227,7 +1119,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupMagnetButtons();
   setupWorkCardLinks();
   setupCounters();
-  setupInfoCards();
   setupMusicPlayer();
   setupWebPet();
   setupGuideFilter();

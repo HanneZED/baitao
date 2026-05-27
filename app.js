@@ -692,18 +692,19 @@ function setupWebPet() {
   const musicPlayer = document.querySelector("[data-music-player]");
   if (!pet || !petStage || !closeButton || !summonButton) return;
 
+  const frameRange = (count) => Array.from({ length: count }, (_, index) => index);
   const states = {
-    idle: { row: 0, duration: 860 },
-    walkRight: { row: 1, duration: 700 },
-    walkLeft: { row: 2, duration: 700 },
-    wave: { row: 3, duration: 680, hold: 1500 },
-    jump: { row: 4, duration: 720, hold: 1150 },
-    sad: { row: 5, duration: 920, hold: 1650 },
-    waiting: { row: 6, duration: 980, hold: 1700 },
-    working: { row: 7, duration: 820, hold: 1650 },
-    review: { row: 8, duration: 900, hold: 1700 },
+    idle: { row: 0, frames: frameRange(6), durations: [280, 110, 110, 140, 140, 320], loop: true },
+    runningRight: { row: 1, frames: frameRange(8), durations: [120, 120, 120, 120, 120, 120, 120, 220], loop: true },
+    runningLeft: { row: 2, frames: frameRange(8), durations: [120, 120, 120, 120, 120, 120, 120, 220], loop: true },
+    waving: { row: 3, frames: frameRange(4), durations: [140, 140, 140, 280], loop: false },
+    jumping: { row: 4, frames: frameRange(5), durations: [140, 140, 140, 140, 280], loop: false },
+    failed: { row: 5, frames: frameRange(8), durations: [140, 140, 140, 140, 140, 140, 140, 240], loop: false },
+    waiting: { row: 6, frames: frameRange(6), durations: [150, 150, 150, 150, 150, 260], loop: false },
+    running: { row: 7, frames: frameRange(6), durations: [120, 120, 120, 120, 120, 220], loop: false },
+    review: { row: 8, frames: frameRange(6), durations: [150, 150, 150, 150, 150, 280], loop: false },
   };
-  const expressionNames = ["wave", "jump", "sad", "waiting", "working", "review"];
+  const expressionNames = ["waving", "jumping", "failed", "waiting", "running", "review"];
   const interactionCooldownMs = 3200;
   const randomBetween = (min, max) => min + Math.random() * (max - min);
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -711,7 +712,9 @@ function setupWebPet() {
   let actionTimer = null;
   let expressionTimer = null;
   let controlTimer = null;
+  let frameTimer = null;
   let moveFrame = null;
+  let activeState = "";
   let lastExpression = "";
   let interactionReadyAt = 0;
   let isDragging = false;
@@ -727,11 +730,52 @@ function setupWebPet() {
     }
   };
 
-  const setState = (name) => {
-    const state = states[name] || states.idle;
-    pet.dataset.petState = name;
+  const stopFrameLoop = () => {
+    window.clearTimeout(frameTimer);
+    frameTimer = null;
+  };
+
+  const setSpriteFrame = (state, frameIndex) => {
+    const frame = state.frames[frameIndex] || 0;
+    const frameX = frame === 0 ? 0 : (frame / 7) * 100;
+    const rowY = state.row === 0 ? 0 : (state.row / 8) * 100;
     pet.style.setProperty("--pet-row", state.row.toString());
-    pet.style.setProperty("--pet-frame-duration", `${state.duration}ms`);
+    pet.style.setProperty("--pet-frame", frame.toString());
+    pet.style.setProperty("--pet-frame-x", `${frameX}%`);
+    pet.style.setProperty("--pet-row-y", `${rowY}%`);
+  };
+
+  const playState = (name, options = {}) => {
+    const state = states[name] || states.idle;
+    const loop = typeof options.loop === "boolean" ? options.loop : state.loop;
+    const restart = options.restart === true;
+    if (!restart && activeState === name && frameTimer && loop) return;
+
+    stopFrameLoop();
+    activeState = name;
+    pet.dataset.petState = name;
+    let frameIndex = 0;
+    setSpriteFrame(state, frameIndex);
+
+    const queueNextFrame = () => {
+      const duration = state.durations[frameIndex] || state.durations[state.durations.length - 1] || 160;
+      frameTimer = window.setTimeout(() => {
+        const isLastFrame = frameIndex >= state.frames.length - 1;
+        if (isLastFrame && !loop) {
+          frameTimer = null;
+          options.onComplete?.();
+          return;
+        }
+
+        frameIndex = isLastFrame ? 0 : frameIndex + 1;
+        setSpriteFrame(state, frameIndex);
+        queueNextFrame();
+      }, duration);
+    };
+
+    if (!reducedMotion && state.frames.length > 1) {
+      queueNextFrame();
+    }
   };
 
   const getPetSize = () => {
@@ -792,15 +836,19 @@ function setupWebPet() {
     summonButton.setAttribute("aria-label", visible ? "摸摸 Cream Cat 小宠物" : "召回 Cream Cat 小宠物");
     musicPlayer?.classList.toggle("is-pet-visible", visible);
     if (visible) {
+      playState("idle");
       scheduleNextAction();
       return;
     }
 
     stopMove();
+    stopFrameLoop();
     window.clearTimeout(actionTimer);
     window.clearTimeout(expressionTimer);
     setControlsOpen(false);
-    setState("idle");
+    activeState = "idle";
+    pet.dataset.petState = "idle";
+    setSpriteFrame(states.idle, 0);
   };
 
   const playExpression = (source = "auto") => {
@@ -818,14 +866,14 @@ function setupWebPet() {
     window.clearTimeout(actionTimer);
 
     const candidates = expressionNames.filter((name) => name !== lastExpression);
-    const nextName = candidates[Math.floor(Math.random() * candidates.length)] || "wave";
+    const nextName = candidates[Math.floor(Math.random() * candidates.length)] || "waving";
     lastExpression = nextName;
-    setState(nextName);
+    playState(nextName, { restart: true });
 
     expressionTimer = window.setTimeout(() => {
-      setState("idle");
+      playState("idle", { restart: true });
       scheduleNextAction();
-    }, states[nextName].hold);
+    }, states[nextName].durations.reduce((total, duration) => total + duration, 0) + 420);
 
     return true;
   };
@@ -848,7 +896,7 @@ function setupWebPet() {
     const start = { ...position };
     const duration = clamp(distance * 11, 1350, 2850);
     const startedAt = performance.now();
-    setState(target.x >= start.x ? "walkRight" : "walkLeft");
+    playState(target.x >= start.x ? "runningRight" : "runningLeft", { restart: true });
     pet.classList.add("is-walking");
 
     const tick = (now) => {
@@ -869,7 +917,7 @@ function setupWebPet() {
       position = target;
       applyPosition();
       pet.classList.remove("is-walking");
-      setState("idle");
+      playState("idle", { restart: true });
       scheduleNextAction();
     };
 
@@ -895,7 +943,7 @@ function setupWebPet() {
     isDragging = true;
     ignoreNextClick = false;
     pet.classList.add("is-dragging");
-    setState("jump");
+    playState("jumping", { loop: true, restart: true });
     petStage.setPointerCapture?.(event.pointerId);
 
     const startPointer = { x: event.clientX, y: event.clientY };
@@ -915,7 +963,7 @@ function setupWebPet() {
     const release = () => {
       isDragging = false;
       pet.classList.remove("is-dragging");
-      setState("idle");
+      playState("idle", { restart: true });
       scheduleNextAction();
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", release);
@@ -954,7 +1002,7 @@ function setupWebPet() {
     applyPosition();
   });
 
-  setState("idle");
+  playState("idle", { restart: true });
   setVisible(true);
 }
 

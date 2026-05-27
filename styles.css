@@ -736,9 +736,10 @@ html[data-theme="dark"] .icon-sun {
 
 .web-pet {
   --pet-cell-w: clamp(88px, 9vw, 116px);
-  --pet-cell-h: calc(var(--pet-cell-w) * 1.083333);
   --pet-row: 0;
-  --pet-frame-duration: 860ms;
+  --pet-frame: 0;
+  --pet-frame-x: 0%;
+  --pet-row-y: 0%;
   position: fixed;
   top: auto;
   left: auto;
@@ -770,7 +771,7 @@ html[data-theme="dark"] .icon-sun {
   position: relative;
   display: grid;
   width: calc(var(--pet-cell-w) + 1.2rem);
-  height: calc(var(--pet-cell-h) + 0.8rem);
+  min-height: calc(var(--pet-cell-w) + 1.75rem);
   place-items: end center;
   border: 0;
   padding: 0;
@@ -812,15 +813,17 @@ html[data-theme="dark"] .icon-sun {
 
 .web-pet-sprite {
   position: relative;
+  display: block;
   width: var(--pet-cell-w);
-  height: var(--pet-cell-h);
+  aspect-ratio: 192 / 208;
   background-image: url("./assets/cream-cat-spritesheet.webp");
   background-repeat: no-repeat;
-  background-size: calc(var(--pet-cell-w) * 8) calc(var(--pet-cell-h) * 9);
-  background-position: 0 calc(var(--pet-row) * var(--pet-cell-h) * -1);
+  background-size: 800% 900%;
+  background-position: var(--pet-frame-x) var(--pet-row-y);
   image-rendering: pixelated;
   filter: drop-shadow(0 10px 16px rgba(132, 92, 82, 0.14));
-  animation: cream-cat-sprite var(--pet-frame-duration) steps(8) infinite, cream-cat-breathe 3.4s var(--ease) infinite;
+  will-change: background-position, transform;
+  animation: cream-cat-breathe 3.4s var(--ease) infinite;
 }
 
 .web-pet.is-walking .web-pet-shadow,
@@ -875,12 +878,6 @@ html[data-theme="dark"] .web-pet-close {
   border-color: rgba(255, 242, 236, 0.14);
   background: rgba(48, 35, 55, 0.86);
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
-}
-
-@keyframes cream-cat-sprite {
-  to {
-    background-position: calc(var(--pet-cell-w) * -8) calc(var(--pet-row) * var(--pet-cell-h) * -1);
-  }
 }
 
 @keyframes cream-cat-breathe {

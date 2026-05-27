@@ -811,8 +811,8 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech {
   pointer-events: none;
   position: absolute;
-  top: -3.62rem;
-  left: 72%;
+  top: -1.45rem;
+  left: 56%;
   z-index: 2;
   max-width: 9.5rem;
   border: 1px solid rgba(233, 138, 167, 0.3);
@@ -829,7 +829,7 @@ html[data-theme="dark"] .icon-sun {
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 0.42rem) rotate(-4deg) scale(0.94);
+  transform: translate(-50%, 0.32rem) rotate(-3deg) scale(0.94);
   transition:
     opacity 240ms var(--ease),
     visibility 240ms var(--ease),
@@ -840,7 +840,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech::after {
   content: "";
   position: absolute;
-  left: 28%;
+  left: 46%;
   bottom: -0.28rem;
   width: 0.52rem;
   height: 0.52rem;
@@ -853,7 +853,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-speech.is-visible {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0) rotate(-4deg) scale(1);
+  transform: translate(-50%, 0) rotate(-3deg) scale(1);
   animation: pet-speech-pop 520ms var(--ease-pop);
 }
 
@@ -875,8 +875,8 @@ html[data-theme="dark"] .icon-sun {
 .web-pet-name {
   pointer-events: none;
   position: absolute;
-  top: -0.56rem;
-  left: 50%;
+  top: 1.08rem;
+  left: 78%;
   z-index: 1;
   border: 1px solid rgba(233, 138, 167, 0.28);
   border-radius: 999px;
@@ -891,7 +891,7 @@ html[data-theme="dark"] .icon-sun {
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 0.28rem) scale(0.96);
+  transform: translate(-10%, 0.18rem) scale(0.96);
   transition:
     opacity 420ms var(--ease),
     visibility 420ms var(--ease),
@@ -902,7 +902,7 @@ html[data-theme="dark"] .icon-sun {
 .web-pet.is-name-visible .web-pet-name {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(-10%, 0) scale(1);
 }
 
 .web-pet-stage:hover {
@@ -1050,56 +1050,56 @@ html[data-theme="dark"] .web-pet-close {
 
 @keyframes pet-speech-pop {
   0% {
-    transform: translate(-50%, 0.42rem) rotate(-4deg) scale(0.9);
+    transform: translate(-50%, 0.32rem) rotate(-3deg) scale(0.9);
   }
 
   68% {
-    transform: translate(-50%, -0.08rem) rotate(-4deg) scale(1.04);
+    transform: translate(-50%, -0.08rem) rotate(-3deg) scale(1.04);
   }
 
   100% {
-    transform: translate(-50%, 0) rotate(-4deg) scale(1);
+    transform: translate(-50%, 0) rotate(-3deg) scale(1);
   }
 }
 
 @keyframes pet-speech-hop {
   0%,
   100% {
-    transform: translate(-50%, 0) rotate(-4deg) scale(1);
+    transform: translate(-50%, 0) rotate(-3deg) scale(1);
   }
 
   34% {
-    transform: translate(-50%, -0.18rem) rotate(-7deg) scale(1.04);
+    transform: translate(-50%, -0.18rem) rotate(-6deg) scale(1.04);
   }
 
   68% {
-    transform: translate(-50%, -0.04rem) rotate(-1deg) scale(1.02);
+    transform: translate(-50%, -0.04rem) rotate(0deg) scale(1.02);
   }
 }
 
 @keyframes pet-speech-silly {
   0%,
   100% {
-    transform: translate(-50%, 0) rotate(-4deg) scale(1);
+    transform: translate(-50%, 0) rotate(-3deg) scale(1);
   }
 
   28% {
-    transform: translate(calc(-50% - 0.16rem), -0.1rem) rotate(-9deg) scale(1.03);
+    transform: translate(calc(-50% - 0.16rem), -0.1rem) rotate(-8deg) scale(1.03);
   }
 
   62% {
-    transform: translate(calc(-50% + 0.18rem), 0.02rem) rotate(1deg) scale(1.01);
+    transform: translate(calc(-50% + 0.18rem), 0.02rem) rotate(2deg) scale(1.01);
   }
 }
 
 @keyframes pet-speech-sad {
   0% {
-    transform: translate(-50%, 0.14rem) rotate(-4deg) scale(0.96);
+    transform: translate(-50%, 0.14rem) rotate(-3deg) scale(0.96);
   }
 
   45%,
   100% {
-    transform: translate(-50%, 0) rotate(-4deg) scale(1);
+    transform: translate(-50%, 0) rotate(-3deg) scale(1);
   }
 }
 

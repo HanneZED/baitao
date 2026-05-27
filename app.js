@@ -694,18 +694,18 @@ function setupWebPet() {
 
   const frameRange = (count) => Array.from({ length: count }, (_, index) => index);
   const states = {
-    idle: { row: 0, frames: frameRange(6), durations: [280, 110, 110, 140, 140, 320], loop: true },
-    runningRight: { row: 1, frames: frameRange(8), durations: [120, 120, 120, 120, 120, 120, 120, 220], loop: true },
-    runningLeft: { row: 2, frames: frameRange(8), durations: [120, 120, 120, 120, 120, 120, 120, 220], loop: true },
-    waving: { row: 3, frames: frameRange(4), durations: [140, 140, 140, 280], loop: false },
-    jumping: { row: 4, frames: frameRange(5), durations: [140, 140, 140, 140, 280], loop: false },
-    failed: { row: 5, frames: frameRange(8), durations: [140, 140, 140, 140, 140, 140, 140, 240], loop: false },
-    waiting: { row: 6, frames: frameRange(6), durations: [150, 150, 150, 150, 150, 260], loop: false },
-    running: { row: 7, frames: frameRange(6), durations: [120, 120, 120, 120, 120, 220], loop: false },
-    review: { row: 8, frames: frameRange(6), durations: [150, 150, 150, 150, 150, 280], loop: false },
+    idle: { row: 0, frames: frameRange(6), durations: [620, 180, 180, 1120, 260, 760], loop: true },
+    runningRight: { row: 1, frames: frameRange(8), durations: [150, 150, 150, 150, 150, 150, 150, 280], loop: true },
+    runningLeft: { row: 2, frames: frameRange(8), durations: [150, 150, 150, 150, 150, 150, 150, 280], loop: true },
+    waving: { row: 3, frames: frameRange(4), durations: [190, 190, 210, 430], loop: false },
+    jumping: { row: 4, frames: frameRange(5), durations: [190, 190, 190, 210, 440], loop: false },
+    failed: { row: 5, frames: frameRange(8), durations: [180, 180, 180, 180, 180, 180, 180, 360], loop: false },
+    waiting: { row: 6, frames: frameRange(6), durations: [190, 190, 190, 190, 190, 420], loop: false },
+    running: { row: 7, frames: frameRange(6), durations: [160, 160, 160, 170, 170, 360], loop: false },
+    review: { row: 8, frames: frameRange(6), durations: [190, 190, 190, 190, 190, 440], loop: false },
   };
   const expressionNames = ["waving", "jumping", "failed", "waiting", "running", "review"];
-  const interactionCooldownMs = 3200;
+  const interactionCooldownMs = 4200;
   const randomBetween = (min, max) => min + Math.random() * (max - min);
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -825,7 +825,7 @@ function setupWebPet() {
       } else {
         playExpression("auto");
       }
-    }, randomBetween(7600, 14500));
+    }, randomBetween(11800, 22000));
   };
 
   const setVisible = (visible) => {
@@ -894,7 +894,7 @@ function setupWebPet() {
     window.clearTimeout(actionTimer);
     window.clearTimeout(expressionTimer);
     const start = { ...position };
-    const duration = clamp(distance * 11, 1350, 2850);
+    const duration = clamp(distance * 13.5, 1800, 3700);
     const startedAt = performance.now();
     playState(target.x >= start.x ? "runningRight" : "runningLeft", { restart: true });
     pet.classList.add("is-walking");

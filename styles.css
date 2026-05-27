@@ -823,7 +823,7 @@ html[data-theme="dark"] .icon-sun {
   image-rendering: pixelated;
   filter: drop-shadow(0 10px 16px rgba(132, 92, 82, 0.14));
   will-change: background-position, transform;
-  animation: cream-cat-breathe 3.4s var(--ease) infinite;
+  animation: cream-cat-breathe 4.8s var(--ease) infinite;
 }
 
 .web-pet.is-walking .web-pet-shadow,
@@ -887,7 +887,7 @@ html[data-theme="dark"] .web-pet-close {
   }
 
   50% {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
   }
 }
 

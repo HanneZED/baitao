@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T00:00:00.000Z",
+  "updatedAt": "2026-05-28T07:33:14.905Z",
   "media": [
     {
       "id": "media-starlight-route",
@@ -159,6 +159,15 @@
       "x": 67,
       "y": 28,
       "rotation": 12
+    },
+    {
+      "id": "picture-mpp6eox2-lvuoh7",
+      "src": "./img/uploads/1779953594326-d30b006e.png",
+      "title": "wave",
+      "description": "wave",
+      "x": 48,
+      "y": 51,
+      "rotation": -7
     }
   ]
 }

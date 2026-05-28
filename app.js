@@ -10,7 +10,7 @@ try {
   savedTheme = root.dataset.theme === "dark" ? "dark" : "light";
 }
 root.dataset.theme = savedTheme;
-const restingCardSelector = ".work-card, .guide-card, .diary-note, .article-panel, .related-card";
+const restingCardSelector = ".work-card, .guide-card, .collection-card, .diary-note, .article-panel, .related-card";
 
 function clearInlineMotion(element) {
   ["transform", "translate", "rotate", "scale"].forEach((property) => {
@@ -398,6 +398,8 @@ function setupTiltCards() {
   if (!canHover || reducedMotion) return;
 
   cards.forEach((card) => {
+    if (card.dataset.tiltBound === "true") return;
+    card.dataset.tiltBound = "true";
     card.addEventListener("pointermove", (event) => {
       const rect = card.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
@@ -486,6 +488,813 @@ function setupCounters() {
   );
 
   counters.forEach((counter) => observer.observe(counter));
+}
+
+function setupContactMiniSpeech() {
+  const card = document.querySelector(".contact-card");
+  const speech = document.querySelector("[data-contact-mini-speech]");
+  const trigger = document.querySelector("[data-contact-mini-trigger]");
+  if (!card || !speech || !trigger) return;
+
+  let speechTimer = null;
+
+  const showSpeech = () => {
+    window.clearTimeout(speechTimer);
+    speech.textContent = "哼哼~";
+    speech.classList.remove("is-visible");
+    speech.setAttribute("aria-hidden", "false");
+    speech.getBoundingClientRect();
+    speech.classList.add("is-visible");
+    speechTimer = window.setTimeout(() => {
+      speech.classList.remove("is-visible");
+      window.setTimeout(() => {
+        if (speech.classList.contains("is-visible")) return;
+        speech.setAttribute("aria-hidden", "true");
+        speech.textContent = "";
+      }, 260);
+    }, 2300);
+  };
+
+  trigger.addEventListener("click", showSpeech);
+
+  if (!("IntersectionObserver" in window)) {
+    showSpeech();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      showSpeech();
+      observer.disconnect();
+    },
+    {
+      rootMargin: "0px 0px -18% 0px",
+      threshold: 0.28,
+    },
+  );
+
+  observer.observe(card);
+}
+
+const defaultSiteContent = {
+  version: 1,
+  media: [
+    {
+      id: "media-starlight-route",
+      type: "guide",
+      category: "game",
+      title: "星光地图收集路线",
+      description: "适合记录开放世界每日路线、材料收集、传送点顺序和高收益绕路。",
+      url: "./guides/starlight-route.html",
+      cover: "./assets/work-guide.svg",
+      tags: "game route collect openworld",
+      body: "",
+    },
+    {
+      id: "media-brush-workflow",
+      type: "guide",
+      category: "art",
+      title: "插画笔刷与上色流程",
+      description: "从草稿、线稿、铺色、阴影到导出的个人绘画流程模板。",
+      url: "./guides/brush-workflow.html",
+      cover: "./assets/work-illustration.svg",
+      tags: "art brush workflow illustration",
+      body: "",
+    },
+    {
+      id: "media-cozy-desk",
+      type: "guide",
+      category: "life",
+      title: "可爱桌面布置清单",
+      description: "小灯、收纳、背景布、拍照角度和桌面维护节奏。",
+      url: "./guides/cozy-desk.html",
+      cover: "./assets/work-room.svg",
+      tags: "life room photo setup",
+      body: "",
+    },
+    {
+      id: "media-bilibili-home",
+      type: "video",
+      category: "video",
+      title: "bilibili 主页",
+      description: "把适合展示的视频链接放在这里，之后可以在网页管理面板里继续添加。",
+      url: "https://space.bilibili.com/7315220?spm_id_from=333.337.0.0",
+      cover: "./img/card.png",
+      tags: "video bilibili works",
+      body: "",
+    },
+  ],
+  collections: [
+    {
+      id: "collection-stickers",
+      title: "超可爱表情包",
+      description: "把喜欢的贴纸、表情包和小图收成一盒彩色糖纸。",
+      cover: "./img/card.png",
+      items: [
+        { src: "./img/cc3/ff1.png", title: "软软的小表情", description: "可以继续在网页里上传更多图片。" },
+        { src: "./img/cc3/ff2.png", title: "贴纸二号", description: "点开卡片后会在本站展开，不会打断 BGM。" },
+        { src: "./img/cc3/ff3.png", title: "贴纸三号", description: "适合做表情包合集或作品小图集。" },
+      ],
+    },
+    {
+      id: "collection-drafts",
+      title: "画稿与灵感",
+      description: "一些像拍立得一样散开的稿件、截图和灵感碎片。",
+      cover: "./img/cc3/cc3_1.jpg",
+      items: [
+        { src: "./img/cc3/cc3_1.jpg", title: "软乎乎的小画稿", description: "灵感先轻轻放在这里。" },
+        { src: "./img/cc3/cc3_2.jpg", title: "夹在纸页里的灵感", description: "后续可以直接在网页里替换。" },
+        { src: "./img/cc3/cc3_3.jpg", title: "像贴纸一样贴上去", description: "小图集会自动排版成子页面。" },
+      ],
+    },
+  ],
+  pictures: [
+    { id: "cc3-1", src: "./img/cc3/cc3_1.jpg", title: "软乎乎的小画稿", description: "软乎乎的小画稿。", x: 38, y: 13, rotation: -18 },
+    { id: "cc3-2", src: "./img/cc3/cc3_2.jpg", title: "夹在纸页里的灵感", description: "夹在纸页里的灵感。", x: 47, y: 9, rotation: 14 },
+    { id: "card-cover", src: "./img/card.png", title: "今天也把可爱收好", description: "今天也把可爱收好。", x: 38, y: 29, rotation: 7, size: "large" },
+    { id: "cc3-3", src: "./img/cc3/cc3_3.jpg", title: "像贴纸一样贴上去", description: "像贴纸一样贴上去。", x: 55, y: 34, rotation: -10 },
+    { id: "cc3-4", src: "./img/cc3/cc3_4.jpg", title: "拖一拖，换个角度", description: "拖一拖，换个角度。", x: 30, y: 43, rotation: -14 },
+    { id: "cc3-5", src: "./img/cc3/cc3_5.jpg", title: "小小的收藏角落", description: "小小的收藏角落。", x: 60, y: 51, rotation: 18 },
+    { id: "cc3-6", src: "./img/cc3/cc3_6.jpg", title: "再偷偷添一张", description: "再偷偷添一张。", x: 67, y: 28, rotation: 12 },
+  ],
+};
+
+function setupContentManager() {
+  const mediaGrid = document.querySelector("[data-content-media-grid]");
+  const collectionGrid = document.querySelector("[data-content-collection-grid]");
+  const admin = document.querySelector("[data-content-admin]");
+  if (!mediaGrid && !collectionGrid && !admin) return;
+
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+  const escapeHtml = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+  const uniqueId = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const normalizeText = (value, fallback = "") => String(value || fallback).trim();
+  const mediaLabel = (type, category) => {
+    if (type === "video") return "视频链接";
+    if (type === "guide") return "图文攻略";
+    if (category === "art") return "绘画攻略";
+    if (category === "game") return "游戏攻略";
+    if (category === "life") return "生活记录";
+    return "内容卡片";
+  };
+
+  let siteContent = clone(defaultSiteContent);
+  let lastSavedContent = clone(defaultSiteContent);
+
+  const normalizeMedia = (item) => ({
+    id: normalizeText(item.id, uniqueId("media")),
+    type: ["video", "guide", "article", "link"].includes(item.type) ? item.type : "article",
+    category: normalizeText(item.category, item.type || "article"),
+    title: normalizeText(item.title, "新内容"),
+    description: normalizeText(item.description),
+    url: normalizeText(item.url),
+    cover: normalizeText(item.cover, "./img/card.png"),
+    tags: normalizeText(item.tags),
+    body: normalizeText(item.body),
+  });
+
+  const normalizeCollection = (item) => ({
+    id: normalizeText(item.id, uniqueId("collection")),
+    title: normalizeText(item.title, "新图片小盒"),
+    description: normalizeText(item.description),
+    cover: normalizeText(item.cover, "./img/card.png"),
+    items: Array.isArray(item.items)
+      ? item.items
+          .map((image) => ({
+            src: normalizeText(image.src),
+            title: normalizeText(image.title, "图片"),
+            description: normalizeText(image.description),
+          }))
+          .filter((image) => image.src)
+      : [],
+  });
+
+  const normalizePicture = (item) => ({
+    id: normalizeText(item.id, uniqueId("picture")),
+    src: normalizeText(item.src),
+    title: normalizeText(item.title, "新图片"),
+    description: normalizeText(item.description),
+    x: Number.isFinite(Number(item.x)) ? Number(item.x) : 50,
+    y: Number.isFinite(Number(item.y)) ? Number(item.y) : 35,
+    rotation: Number.isFinite(Number(item.rotation)) ? Number(item.rotation) : 0,
+    size: item.size === "large" ? "large" : undefined,
+  });
+
+  const normalizeContent = (content) => ({
+    version: 1,
+    updatedAt: content.updatedAt || new Date().toISOString(),
+    media: Array.isArray(content.media) ? content.media.map(normalizeMedia) : clone(defaultSiteContent.media),
+    collections: Array.isArray(content.collections) ? content.collections.map(normalizeCollection) : clone(defaultSiteContent.collections),
+    pictures: Array.isArray(content.pictures) ? content.pictures.map(normalizePicture).filter((item) => item.src) : clone(defaultSiteContent.pictures),
+  });
+
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const pickFile = (multiple = false) =>
+    new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.multiple = multiple;
+      input.addEventListener("change", () => resolve([...input.files]));
+      input.click();
+    });
+
+  const renderMediaCards = () => {
+    if (!mediaGrid) return;
+    mediaGrid.replaceChildren();
+    siteContent.media.forEach((item) => {
+      const isInternalDetail = item.body || (item.type === "article" && !item.url);
+      const link = document.createElement("a");
+      link.className = "guide-card media-card tilt-card is-visible";
+      link.href = isInternalDetail ? `#${item.id}` : item.url || `#${item.id}`;
+      link.dataset.tags = `${item.type} ${item.category} ${item.tags || ""}`.trim();
+      link.dataset.contentCard = "";
+      if (isInternalDetail) link.dataset.contentDetail = item.id;
+      if (item.url && /^https?:/i.test(item.url) && !isInternalDetail) {
+        link.target = "_blank";
+        link.rel = "noreferrer";
+      }
+      link.innerHTML = `
+        <img src="${escapeHtml(item.cover || "./img/card.png")}" alt="" loading="lazy" decoding="async" />
+        <span>${escapeHtml(mediaLabel(item.type, item.category))}</span>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.description)}</p>
+        <strong>${item.type === "video" ? "打开视频" : "查看详情"}</strong>
+      `;
+      mediaGrid.append(link);
+    });
+  };
+
+  const renderCollectionCards = () => {
+    if (!collectionGrid) return;
+    collectionGrid.replaceChildren();
+    siteContent.collections.forEach((item) => {
+      const card = document.createElement("button");
+      card.className = "collection-card tilt-card is-visible";
+      card.type = "button";
+      card.dataset.contentDetail = item.id;
+      card.innerHTML = `
+        <img src="${escapeHtml(item.cover || "./img/card.png")}" alt="" loading="lazy" decoding="async" />
+        <span>Picture Box</span>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.description)}</p>
+      `;
+      collectionGrid.append(card);
+    });
+  };
+
+  const renderAdminList = () => {
+    const list = admin?.querySelector("[data-admin-current-list]");
+    if (!list) return;
+    const rows = [
+      ...siteContent.media.map((item) => ({ type: "media", id: item.id, label: `内容：${item.title}` })),
+      ...siteContent.collections.map((item) => ({ type: "collection", id: item.id, label: `小盒：${item.title}` })),
+    ];
+    list.innerHTML = `
+      <h3>当前内容</h3>
+      ${rows
+        .map(
+          (row) => `
+            <div class="content-admin-list-row">
+              <span>${escapeHtml(row.label)}</span>
+              <button type="button" data-admin-remove="${escapeHtml(row.type)}" data-admin-remove-id="${escapeHtml(row.id)}">移除</button>
+            </div>
+          `,
+        )
+        .join("")}
+    `;
+  };
+
+  const syncContentMetrics = () => {
+    document.querySelectorAll("[data-content-collection-count]").forEach((item) => {
+      item.textContent = String(siteContent.collections.length);
+    });
+    document.querySelectorAll("[data-content-picture-count]").forEach((item) => {
+      item.textContent = String(siteContent.pictures.length);
+    });
+    document.querySelectorAll("[data-picture-wall-count]").forEach((item) => {
+      item.textContent = `${siteContent.pictures.length} 张`;
+    });
+  };
+
+  const renderAll = () => {
+    renderMediaCards();
+    renderCollectionCards();
+    renderAdminList();
+    syncContentMetrics();
+    bootIcons();
+    setupTiltCards();
+    document.dispatchEvent(new CustomEvent("kawaii:content-rendered"));
+  };
+
+  const loadContent = async () => {
+    try {
+      const response = await fetch("./data/site-content.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("content file missing");
+      siteContent = normalizeContent(await response.json());
+      lastSavedContent = clone(siteContent);
+      renderAll();
+    } catch {
+      siteContent = normalizeContent(defaultSiteContent);
+      lastSavedContent = clone(siteContent);
+      renderAll();
+    }
+  };
+
+  const getAdminKey = () => {
+    const saved = sessionStorage.getItem("kawaii-admin-key") || "";
+    const field = admin?.querySelector('[name="key"]');
+    const current = field?.value?.trim() || saved;
+    if (current) sessionStorage.setItem("kawaii-admin-key", current);
+    return current;
+  };
+
+  const setAdminStatus = (message, tone = "") => {
+    const status = admin?.querySelector("[data-admin-status]");
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.tone = tone;
+  };
+
+  const openAdmin = () => {
+    if (!admin) return;
+    admin.hidden = false;
+    admin.setAttribute("aria-hidden", "false");
+    const keyField = admin.querySelector('[name="key"]');
+    if (keyField && !keyField.value) keyField.value = sessionStorage.getItem("kawaii-admin-key") || "";
+    document.body.classList.add("is-content-admin-open");
+    setSmoothScrollPaused(true);
+    bootIcons();
+    requestAnimationFrame(() => {
+      admin.querySelector(".content-admin-shell")?.scrollTo({ top: 0, behavior: "auto" });
+    });
+  };
+
+  const closeAdmin = () => {
+    if (!admin) return;
+    admin.hidden = true;
+    admin.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("is-content-admin-open");
+    if (!document.body.classList.contains("is-guide-view-open")) setSmoothScrollPaused(false);
+  };
+
+  const saveSiteContent = async () => {
+    const key = getAdminKey();
+    if (!key) {
+      openAdmin();
+      setAdminStatus("请先输入管理密钥，再保存到网站。", "error");
+      return false;
+    }
+
+    setAdminStatus("正在保存到 GitHub，并等待 Vercel 自动部署...", "loading");
+    try {
+      const response = await fetch("/api/content", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ key, content: siteContent }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "保存失败");
+      siteContent = normalizeContent(data);
+      lastSavedContent = clone(siteContent);
+      renderAll();
+      setAdminStatus("保存成功。Vercel 通常会在几十秒内自动更新线上页面。", "success");
+      return true;
+    } catch (error) {
+      setAdminStatus(`保存失败：${error.message || "请检查 Vercel 环境变量和 GitHub Token"}`, "error");
+      return false;
+    }
+  };
+
+  const createMediaDetail = (id) => {
+    const item = siteContent.media.find((entry) => entry.id === id);
+    if (!item) return null;
+    const section = document.createElement("section");
+    section.className = "dynamic-detail content-detail";
+    const paragraphs = (item.body || item.description)
+      .split(/\n{2,}/)
+      .map((text) => `<p>${escapeHtml(text)}</p>`)
+      .join("");
+    section.innerHTML = `
+      <div class="content-detail-hero">
+        <img src="${escapeHtml(item.cover || "./img/card.png")}" alt="" />
+        <div>
+          <span>${escapeHtml(mediaLabel(item.type, item.category))}</span>
+          <h1>${escapeHtml(item.title)}</h1>
+          <p>${escapeHtml(item.description)}</p>
+          ${item.url ? `<a class="button button-primary" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><span>打开原链接</span><i data-lucide="external-link" aria-hidden="true"></i></a>` : ""}
+        </div>
+      </div>
+      <article class="content-detail-body">${paragraphs}</article>
+    `;
+    return { title: item.title, node: section };
+  };
+
+  const createCollectionDetail = (id) => {
+    const item = siteContent.collections.find((entry) => entry.id === id);
+    if (!item) return null;
+    const section = document.createElement("section");
+    section.className = "dynamic-detail collection-detail";
+    section.innerHTML = `
+      <div class="content-detail-hero">
+        <img src="${escapeHtml(item.cover || "./img/card.png")}" alt="" />
+        <div>
+          <span>Picture Box</span>
+          <h1>${escapeHtml(item.title)}</h1>
+          <p>${escapeHtml(item.description)}</p>
+        </div>
+      </div>
+      <div class="collection-detail-grid">
+        ${item.items
+          .map(
+            (image) => `
+              <figure>
+                <img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.title)}" loading="lazy" decoding="async" />
+                <figcaption>
+                  <strong>${escapeHtml(image.title)}</strong>
+                  <span>${escapeHtml(image.description)}</span>
+                </figcaption>
+              </figure>
+            `,
+          )
+          .join("")}
+      </div>
+    `;
+    return { title: item.title, node: section };
+  };
+
+  const createDetail = (id) => createMediaDetail(id) || createCollectionDetail(id);
+
+  const setupPictureWall = (wall) => {
+    const stage = wall.querySelector("[data-picture-stage]");
+    const input = wall.querySelector("[data-picture-input]");
+    const uploadButton = wall.querySelector("[data-picture-upload]");
+    const saveButton = wall.querySelector("[data-picture-save]");
+    const resetButton = wall.querySelector("[data-picture-cancel]");
+    const fullscreenButton = wall.querySelector("[data-picture-fullscreen]");
+    const returnButton = wall.querySelector("[data-picture-return]");
+    const editor = wall.querySelector("[data-picture-editor]");
+    const editToggle = wall.querySelector("[data-picture-edit-toggle]");
+    const compose = wall.querySelector("[data-picture-compose]");
+    const description = wall.querySelector("[data-picture-description]");
+    const shell = wall.closest(".guide-view-shell");
+    const guideView = wall.closest("[data-guide-view]");
+    if (!stage) return;
+
+    let isPictureEditing = false;
+
+    const setPictureEditing = (editing) => {
+      isPictureEditing = editing;
+      wall.classList.toggle("is-editing", editing);
+      editor?.classList.toggle("is-open", editing);
+      if (editToggle) {
+        editToggle.setAttribute("aria-expanded", String(editing));
+        editToggle.setAttribute("aria-label", editing ? "收起图片墙编辑菜单" : "展开图片墙编辑菜单");
+      }
+    };
+
+    const focusPictures = (items) => {
+      if (!items.length) return [];
+      const xs = items.map((item) => Number(item.x) || 50);
+      const ys = items.map((item) => Number(item.y) || 50);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const currentCenter = {
+        x: (minX + maxX) / 2,
+        y: (minY + maxY) / 2,
+      };
+      const targetCenter = {
+        x: 50,
+        y: 45,
+      };
+      const shift = {
+        x: targetCenter.x - currentCenter.x,
+        y: targetCenter.y - currentCenter.y,
+      };
+      const verticalSpan = Math.max(1, maxY - minY);
+      const horizontalSpan = Math.max(1, maxX - minX);
+      const minVisibleY = verticalSpan > 52 ? 12 : 18;
+      const maxVisibleY = verticalSpan > 52 ? 88 : 76;
+      const minVisibleX = horizontalSpan > 58 ? 8 : 18;
+      const maxVisibleX = horizontalSpan > 58 ? 92 : 82;
+
+      return items.map((item) => ({
+        ...item,
+        x: Math.min(Math.max((Number(item.x) || 50) + shift.x, minVisibleX), maxVisibleX),
+        y: Math.min(Math.max((Number(item.y) || 50) + shift.y, minVisibleY), maxVisibleY),
+      }));
+    };
+
+    const setPictureWindowExpanded = (expanded) => {
+      wall.classList.toggle("is-expanded", expanded);
+      shell?.classList.toggle("is-picture-expanded", expanded);
+      guideView?.classList.toggle("is-picture-expanded", expanded);
+      if (fullscreenButton) {
+        fullscreenButton.setAttribute("aria-pressed", String(expanded));
+        fullscreenButton.setAttribute("aria-label", expanded ? "缩小图片墙窗口" : "展开图片墙窗口");
+        fullscreenButton.innerHTML = expanded
+          ? '<i data-lucide="minimize-2" aria-hidden="true"></i><span>缩小</span>'
+          : '<i data-lucide="maximize-2" aria-hidden="true"></i><span>展开</span>';
+      }
+      bootIcons();
+    };
+
+    const pictureEnterDelay = (index) => {
+      const intervals = [360, 430, 520, 610];
+      let delay = 0;
+      for (let i = 0; i < index; i += 1) delay += intervals[i % intervals.length];
+      return delay;
+    };
+
+    const renderPictures = ({ animate = false } = {}) => {
+      stage.replaceChildren();
+      const displayPictures = focusPictures(siteContent.pictures);
+      displayPictures.forEach((displayItem, index) => {
+        const item = siteContent.pictures.find((entry) => entry.id === displayItem.id) || displayItem;
+        const card = document.createElement("article");
+        card.className = `picture-card${item.size === "large" ? " is-large" : ""}${animate && !reducedMotion ? "" : " is-settled"}`;
+        card.dataset.pictureId = item.id;
+        card.style.setProperty("--x", `${displayItem.x}%`);
+        card.style.setProperty("--y", `${displayItem.y}%`);
+        card.style.setProperty("--rotate", `${item.rotation}deg`);
+        card.style.setProperty("--enter-delay", `${pictureEnterDelay(index)}ms`);
+        card.innerHTML = `
+          <button type="button" class="picture-delete" data-picture-delete aria-label="删除图片">×</button>
+          <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.title)}" draggable="false" />
+          <p>${escapeHtml(item.description || item.title)}</p>
+        `;
+        if (animate && !reducedMotion) {
+          card.addEventListener("animationend", () => card.classList.add("is-settled"), { once: true });
+        }
+        stage.append(card);
+      });
+      syncContentMetrics();
+      bootIcons();
+    };
+
+    const addPictureFiles = async (files) => {
+      const startIndex = siteContent.pictures.length;
+      for (const [index, file] of files.entries()) {
+        const dataUrl = await fileToDataUrl(file);
+        siteContent.pictures.push({
+          id: uniqueId("picture"),
+          src: dataUrl,
+          title: file.name.replace(/\.[^.]+$/, "") || "新图片",
+          description: description?.value?.trim() || file.name.replace(/\.[^.]+$/, "") || "新图片",
+          x: 34 + ((startIndex + index) % 5) * 7,
+          y: 18 + ((startIndex + index) % 4) * 11,
+          rotation: Math.round(-14 + Math.random() * 28),
+        });
+      }
+      if (description) description.value = "";
+      renderPictures();
+    };
+
+    stage.addEventListener("pointerdown", (event) => {
+      const card = event.target.closest(".picture-card");
+      if (!card || event.target.closest("button")) return;
+      const item = siteContent.pictures.find((entry) => entry.id === card.dataset.pictureId);
+      if (!item) return;
+      const stageRect = stage.getBoundingClientRect();
+      const start = {
+        x: event.clientX,
+        y: event.clientY,
+        itemX: Number.parseFloat(card.style.getPropertyValue("--x")) || item.x,
+        itemY: Number.parseFloat(card.style.getPropertyValue("--y")) || item.y,
+      };
+      card.setPointerCapture?.(event.pointerId);
+      card.classList.add("is-settled");
+      card.classList.add("is-dragging");
+
+      const move = (moveEvent) => {
+        const nextX = start.itemX + ((moveEvent.clientX - start.x) / stageRect.width) * 100;
+        const nextY = start.itemY + ((moveEvent.clientY - start.y) / stageRect.height) * 100;
+        item.x = Math.min(Math.max(nextX, 8), 92);
+        item.y = Math.min(Math.max(nextY, 6), 92);
+        card.style.setProperty("--x", `${item.x}%`);
+        card.style.setProperty("--y", `${item.y}%`);
+      };
+
+      const release = () => {
+        card.classList.add("is-settled");
+        card.classList.remove("is-dragging");
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", release);
+        window.removeEventListener("pointercancel", release);
+      };
+
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", release, { once: true });
+      window.addEventListener("pointercancel", release, { once: true });
+    });
+
+    stage.addEventListener("click", (event) => {
+      const deleteButton = event.target.closest("[data-picture-delete]");
+      if (!deleteButton) return;
+      if (!isPictureEditing) return;
+      const card = deleteButton.closest(".picture-card");
+      siteContent.pictures = siteContent.pictures.filter((item) => item.id !== card?.dataset.pictureId);
+      renderPictures();
+    });
+
+    editToggle?.addEventListener("click", () => {
+      setPictureEditing(!isPictureEditing);
+    });
+
+    fullscreenButton?.addEventListener("click", () => {
+      setPictureWindowExpanded(!wall.classList.contains("is-expanded"));
+    });
+
+    returnButton?.addEventListener("click", () => {
+      if (wall.classList.contains("is-expanded")) setPictureWindowExpanded(false);
+      document.querySelector("[data-guide-close]")?.click();
+    });
+
+    uploadButton?.addEventListener("click", () => input?.click());
+    input?.addEventListener("change", () => {
+      addPictureFiles([...input.files]);
+      input.value = "";
+    });
+
+    saveButton?.addEventListener("click", async () => {
+      openAdmin();
+      if (!getAdminKey()) {
+        setAdminStatus("图片墙已经在当前页面预览更新。输入管理密钥后，点“保存到网站”即可正式保存。", "loading");
+        return;
+      }
+      await saveSiteContent();
+    });
+
+    resetButton?.addEventListener("click", () => {
+      siteContent = normalizeContent(lastSavedContent);
+      renderAll();
+      renderPictures();
+    });
+
+    compose?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      siteContent.pictures.push({
+        id: uniqueId("picture"),
+        src: "./img/card.png",
+        title: "新图片卡",
+        description: description?.value?.trim() || "新图片卡",
+        x: 48,
+        y: 48,
+        rotation: Math.round(-10 + Math.random() * 20),
+        size: "large",
+      });
+      if (description) description.value = "";
+      renderPictures();
+    });
+
+    renderPictures({ animate: true });
+  };
+
+  const mountDynamicView = (container) => {
+    const wall = container.querySelector("[data-picture-wall]");
+    if (wall) setupPictureWall(wall);
+  };
+
+  admin?.addEventListener("click", (event) => {
+    const removeButton = event.target.closest("[data-admin-remove]");
+    if (removeButton) {
+      const type = removeButton.dataset.adminRemove;
+      const id = removeButton.dataset.adminRemoveId;
+      if (type === "media") siteContent.media = siteContent.media.filter((item) => item.id !== id);
+      if (type === "collection") siteContent.collections = siteContent.collections.filter((item) => item.id !== id);
+      renderAll();
+      setAdminStatus("已从页面预览移除。确认没问题后点“保存到网站”。", "success");
+      return;
+    }
+    if (event.target.closest("[data-content-admin-close]")) closeAdmin();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (event.target.closest("[data-content-admin-open]")) {
+      event.preventDefault();
+      openAdmin();
+    }
+  });
+
+  admin?.querySelector(".content-admin-shell")?.addEventListener(
+    "wheel",
+    (event) => {
+      event.stopPropagation();
+    },
+    { passive: true },
+  );
+
+  admin?.querySelector("[data-admin-upload-cover]")?.addEventListener("click", async () => {
+    const [file] = await pickFile(false);
+    if (!file) return;
+    admin.querySelector('[data-admin-media-form] [name="cover"]').value = await fileToDataUrl(file);
+  });
+
+  admin?.querySelector("[data-admin-upload-collection-cover]")?.addEventListener("click", async () => {
+    const [file] = await pickFile(false);
+    if (!file) return;
+    admin.querySelector('[data-admin-collection-form] [name="cover"]').value = await fileToDataUrl(file);
+  });
+
+  admin?.querySelector("[data-admin-fetch-cover]")?.addEventListener("click", async () => {
+    const form = admin.querySelector("[data-admin-media-form]");
+    const url = form?.elements.url.value.trim();
+    if (!url) {
+      setAdminStatus("先粘贴一个链接，再读取封面。", "error");
+      return;
+    }
+    setAdminStatus("正在读取链接标题和封面...", "loading");
+    try {
+      const response = await fetch(`/api/metadata?url=${encodeURIComponent(url)}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "读取失败");
+      if (data.title && !form.elements.title.value) form.elements.title.value = data.title;
+      if (data.description && !form.elements.description.value) form.elements.description.value = data.description;
+      if (data.cover) form.elements.cover.value = data.cover;
+      setAdminStatus("已读取链接信息。请确认后添加到首页。", "success");
+    } catch (error) {
+      setAdminStatus(`读取失败：${error.message || "这个链接没有提供可识别封面"}`, "error");
+    }
+  });
+
+  admin?.querySelector("[data-admin-media-form]")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const type = normalizeText(formData.get("type"), "article");
+    const category = normalizeText(formData.get("category"), type);
+    siteContent.media.unshift(
+      normalizeMedia({
+        id: uniqueId("media"),
+        type,
+        category,
+        title: formData.get("title"),
+        url: formData.get("url"),
+        cover: formData.get("cover") || "./img/card.png",
+        description: formData.get("description"),
+        body: formData.get("body"),
+        tags: `${type} ${category}`,
+      }),
+    );
+    form.reset();
+    renderAll();
+    setAdminStatus("已添加到页面预览。确认没问题后点“保存到网站”。", "success");
+  });
+
+  admin?.querySelector("[data-admin-collection-form]")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const files = [...form.elements.images.files];
+    const images = [];
+    for (const file of files) {
+      images.push({
+        src: await fileToDataUrl(file),
+        title: file.name.replace(/\.[^.]+$/, "") || "图片",
+        description: "",
+      });
+    }
+    const cover = normalizeText(formData.get("cover")) || images[0]?.src || "./img/card.png";
+    siteContent.collections.unshift(
+      normalizeCollection({
+        id: uniqueId("collection"),
+        title: formData.get("title"),
+        description: formData.get("description"),
+        cover,
+        items: images,
+      }),
+    );
+    form.reset();
+    renderAll();
+    setAdminStatus("小盒已添加到页面预览。确认没问题后点“保存到网站”。", "success");
+  });
+
+  admin?.querySelector("[data-admin-save-form]")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await saveSiteContent();
+  });
+
+  window.kawaiiContent = {
+    createDetail,
+    getContent: () => siteContent,
+    mountDynamicView,
+    openAdmin,
+    saveSiteContent,
+  };
+
+  renderAll();
+  loadContent();
 }
 
 function setupMusicPlayer() {
@@ -805,6 +1614,7 @@ function setupWebPet() {
     petSpeech.setAttribute("aria-hidden", "false");
     petSpeech.getBoundingClientRect();
     petSpeech.classList.add("is-visible", `is-${tone}`);
+    if (!Number.isFinite(visibleMs)) return;
     speechTimer = window.setTimeout(() => {
       petSpeech.classList.remove("is-visible");
       window.setTimeout(() => {
@@ -1027,7 +1837,7 @@ function setupWebPet() {
     clearActionTimers();
     stopMove();
     setControlsOpen(false);
-    sayPet("呜呜~", "sad", 3600);
+    sayPet("呜呜~~", "sad", Infinity);
     playState("failed", {
       restart: true,
       tempo: 1.72,
@@ -1042,6 +1852,7 @@ function setupWebPet() {
     isNeglected = false;
     clearActionTimers();
     stopMove();
+    hidePetHints();
     window.clearTimeout(inactivityTimer);
     playState("failed", {
       restart: true,
@@ -1303,8 +2114,8 @@ function setupWebPet() {
   requestAnimationFrame(() => {
     const size = getPetSize();
     position = clampPosition({
-      x: window.innerWidth - size.width - 18,
-      y: window.innerHeight - size.height - 18,
+      x: Math.min(window.innerWidth - size.width - 18, Math.max(18, window.innerWidth * 0.48)),
+      y: window.innerHeight - size.height - 24,
     });
     applyPosition();
   });
@@ -1315,13 +2126,13 @@ function setupWebPet() {
 function setupGuideFilter() {
   const search = document.querySelector("#guide-search");
   const chips = document.querySelectorAll(".filter-chip");
-  const guides = document.querySelectorAll(".guide-card");
-  if (!search || !chips.length || !guides.length) return;
+  if (!search || !chips.length) return;
 
   let active = "all";
 
   const apply = () => {
     const query = search.value.trim().toLowerCase();
+    const guides = document.querySelectorAll(".guide-card");
     guides.forEach((guide) => {
       const tags = guide.dataset.tags || "";
       const text = guide.textContent.toLowerCase();
@@ -1332,6 +2143,7 @@ function setupGuideFilter() {
   };
 
   chips.forEach((chip) => {
+    if (chip.hasAttribute("data-content-admin-open")) return;
     chip.addEventListener("click", () => {
       chips.forEach((item) => item.classList.remove("is-active"));
       chip.classList.add("is-active");
@@ -1341,6 +2153,7 @@ function setupGuideFilter() {
   });
 
   search.addEventListener("input", apply);
+  document.addEventListener("kawaii:content-rendered", apply);
 }
 
 function setupGuideView() {
@@ -1351,7 +2164,7 @@ function setupGuideView() {
   const title = document.querySelector("#guide-view-title");
   const closeTriggers = document.querySelectorAll("[data-guide-close]");
   const guideLinks = document.querySelectorAll(".guide-card[href]");
-  if (!view || !content || !status || !title || !guideLinks.length) return;
+  if (!view || !content || !status || !title) return;
 
   const homeTitle = document.title;
   let lastFocused = null;
@@ -1402,6 +2215,63 @@ function setupGuideView() {
     content.querySelectorAll("[data-reveal], [data-split]").forEach((item) => {
       item.classList.add("is-visible");
     });
+  };
+
+  const openInlineView = ({ node, viewTitle = "内容详情", path = "#detail", push = true, depth = guideDepth + 1, state = {} }) => {
+    requestId += 1;
+    lastFocused = document.activeElement;
+    showView();
+    content.replaceChildren(node);
+    status.textContent = "";
+    title.textContent = viewTitle;
+    document.title = `${viewTitle} | 肥窝`;
+    content.scrollTop = 0;
+    content.focus({ preventScroll: true });
+    window.kawaiiContent?.mountDynamicView?.(content);
+    bootIcons();
+
+    if (push) {
+      guideDepth = depth;
+      history.pushState(
+        { guideView: true, inlineView: true, guideDepth, ...state },
+        "",
+        path,
+      );
+    } else {
+      guideDepth = depth;
+    }
+  };
+
+  const openTemplateView = (templateId, { push = true, depth = guideDepth + 1 } = {}) => {
+    const template = document.querySelector(`#${CSS.escape(templateId)}`);
+    if (!template) return false;
+    const node = template.content.cloneNode(true);
+    const host = document.createElement("div");
+    host.append(node);
+    const trigger = document.querySelector(`[data-view-template="${templateId}"]`);
+    openInlineView({
+      node: host,
+      viewTitle: trigger?.dataset.viewTitle || "内容详情",
+      path: trigger?.dataset.viewPath || `#${templateId}`,
+      push,
+      depth,
+      state: { templateId },
+    });
+    return true;
+  };
+
+  const openContentDetail = (detailId, { push = true, depth = guideDepth + 1 } = {}) => {
+    const detail = window.kawaiiContent?.createDetail?.(detailId);
+    if (!detail) return false;
+    openInlineView({
+      node: detail.node,
+      viewTitle: detail.title || "内容详情",
+      path: `#${detailId}`,
+      push,
+      depth,
+      state: { detailId },
+    });
+    return true;
   };
 
   const openGuide = async (url, { push = true, depth = guideDepth + 1 } = {}) => {
@@ -1467,6 +2337,30 @@ function setupGuideView() {
     });
   });
 
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const templateTrigger = event.target.closest("[data-view-template]");
+    if (templateTrigger) {
+      event.preventDefault();
+      openTemplateView(templateTrigger.dataset.viewTemplate);
+      return;
+    }
+
+    const detailTrigger = event.target.closest("[data-content-detail]");
+    if (detailTrigger) {
+      event.preventDefault();
+      openContentDetail(detailTrigger.dataset.contentDetail);
+      return;
+    }
+
+    const guideLink = event.target.closest(".guide-card[href]");
+    if (!guideLink || !isGuideUrl(guideLink.href)) return;
+    event.preventDefault();
+    openGuide(guideLink.href);
+  });
+
   content.addEventListener("click", (event) => {
     const link = event.target.closest("a[href]");
     if (!link) return;
@@ -1513,8 +2407,40 @@ function setupGuideView() {
       });
       return;
     }
+    if (event.state?.guideView && event.state.templateId) {
+      openTemplateView(event.state.templateId, {
+        push: false,
+        depth: Number(event.state.guideDepth) || 1,
+      });
+      return;
+    }
+    if (event.state?.guideView && event.state.detailId) {
+      openContentDetail(event.state.detailId, {
+        push: false,
+        depth: Number(event.state.guideDepth) || 1,
+      });
+      return;
+    }
     hideView();
   });
+
+  const openInitialHashView = () => {
+    const hash = window.location.hash;
+    if (!hash || hash.length <= 1) return;
+
+    const templateTrigger = document.querySelector(`[data-view-template][data-view-path="${CSS.escape(hash)}"]`);
+    if (templateTrigger) {
+      openTemplateView(templateTrigger.dataset.viewTemplate, { push: false, depth: 1 });
+      return;
+    }
+
+    const detailId = decodeURIComponent(hash.slice(1));
+    if (window.kawaiiContent?.createDetail?.(detailId)) {
+      openContentDetail(detailId, { push: false, depth: 1 });
+    }
+  };
+
+  requestAnimationFrame(openInitialHashView);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1533,6 +2459,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupMagnetButtons();
   setupWorkCardLinks();
   setupCounters();
+  setupContactMiniSpeech();
+  setupContentManager();
   setupMusicPlayer();
   setupWebPet();
   setupGuideFilter();

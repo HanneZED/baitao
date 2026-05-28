@@ -83,7 +83,6 @@
       <nav class="main-nav" aria-label="主导航">
         <a href="#works">作品</a>
         <a href="#guides">攻略</a>
-        <a href="#diary">手帐</a>
         <a href="#contact">联系</a>
       </nav>
 
@@ -145,7 +144,7 @@
             <span>小窝</span>
           </h1>
           <p class="hero-lede" data-reveal>
-            这里轻轻收着橱窗作品、游戏攻略、绘画流程和一点点手帐碎片。
+            这里轻轻收着橱窗作品、视频攻略、绘画流程和一点点图片小盒。
             还在慢慢长大，但每一格都会尽量整理得柔软、清楚、好翻。
           </p>
           <div class="hero-actions" data-reveal>
@@ -247,6 +246,7 @@
         <div class="section-heading">
           <p class="eyebrow" data-reveal>橱窗链接</p>
           <h2 id="works-title" data-reveal>把作品和约稿信息放在一张安静的小卡里。</h2>
+          <p class="section-heading-note" data-reveal>样图、价格和说明都收在这里，需要时可以轻轻点开。</p>
         </div>
 
         <div class="work-grid">
@@ -291,136 +291,149 @@
       <section class="section guides-section" id="guides" aria-labelledby="guides-title">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow" data-reveal>攻略目录</p>
-            <h2 id="guides-title" data-reveal>攻略可以像手帐一样，清楚，也有一点点温度。</h2>
+            <p class="eyebrow" data-reveal>应用 &amp; 视频</p>
+            <h2 id="guides-title" data-reveal>这些都是好东西哦，我一个人反复看了好多次！</h2>
+            <p class="section-heading-note" data-reveal>把常用链接和小记录分门别类放好，翻找时不打扰页面的呼吸。</p>
           </div>
 
           <div class="guide-tools" data-reveal>
             <label class="search-box" for="guide-search">
               <i data-lucide="search" aria-hidden="true"></i>
-              <input id="guide-search" type="search" placeholder="搜索攻略、作品或标签" />
+              <input id="guide-search" type="search" placeholder="搜索视频、攻略或标签" />
             </label>
             <div class="filter-row" aria-label="攻略筛选">
               <button class="filter-chip is-active" type="button" data-filter="all">全部</button>
+              <button class="filter-chip" type="button" data-filter="video">视频</button>
+              <button class="filter-chip" type="button" data-filter="guide">攻略</button>
               <button class="filter-chip" type="button" data-filter="game">游戏</button>
               <button class="filter-chip" type="button" data-filter="art">绘画</button>
               <button class="filter-chip" type="button" data-filter="life">生活</button>
-              <button class="filter-chip" type="button" data-filter="archive">归档</button>
+              <button class="filter-chip content-manage-trigger" type="button" data-content-admin-open>
+                <i data-lucide="settings-2" aria-hidden="true"></i>
+                <span>更新内容</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="guide-grid" id="guide-grid">
-          <a class="guide-card tilt-card" href="./guides/starlight-route.html" data-tags="game route collect openworld" data-reveal>
+        <div class="guide-grid content-grid" id="guide-grid" data-content-media-grid>
+          <a class="guide-card media-card tilt-card" href="./guides/starlight-route.html" data-tags="guide game route collect openworld" data-reveal>
+            <img src="./assets/work-guide.svg" alt="" loading="lazy" decoding="async" />
             <span>游戏攻略</span>
             <h3>星光地图收集路线</h3>
             <p>适合记录开放世界每日路线、材料收集、传送点顺序和高收益绕路。</p>
             <strong>查看详情</strong>
           </a>
-          <a class="guide-card tilt-card" href="./guides/brush-workflow.html" data-tags="art brush workflow illustration" data-reveal>
+          <a class="guide-card media-card tilt-card" href="./guides/brush-workflow.html" data-tags="guide art brush workflow illustration" data-reveal>
+            <img src="./assets/work-illustration.svg" alt="" loading="lazy" decoding="async" />
             <span>绘画攻略</span>
             <h3>插画笔刷与上色流程</h3>
             <p>从草稿、线稿、铺色、阴影到导出的个人绘画流程模板。</p>
             <strong>查看详情</strong>
           </a>
-          <a class="guide-card tilt-card" href="./guides/cozy-desk.html" data-tags="life room photo setup" data-reveal>
+          <a class="guide-card media-card tilt-card" href="./guides/cozy-desk.html" data-tags="guide life room photo setup" data-reveal>
+            <img src="./assets/work-room.svg" alt="" loading="lazy" decoding="async" />
             <span>生活攻略</span>
             <h3>可爱桌面布置清单</h3>
             <p>小灯、收纳、背景布、拍照角度和桌面维护节奏。</p>
             <strong>查看详情</strong>
           </a>
-          <a class="guide-card tilt-card" href="./guides/archive-tags.html" data-tags="archive tags notion assets" data-reveal>
-            <span>归档攻略</span>
-            <h3>作品与资料标签系统</h3>
-            <p>把作品、攻略、素材、截图和灵感收成不难找的个人资料库。</p>
-            <strong>查看详情</strong>
+          <a class="guide-card media-card tilt-card" href="https://space.bilibili.com/7315220?spm_id_from=333.337.0.0" target="_blank" rel="noreferrer" data-tags="video bilibili works" data-reveal>
+            <img src="./img/card.png" alt="" loading="lazy" decoding="async" />
+            <span>视频链接</span>
+            <h3>bilibili 主页</h3>
+            <p>把适合展示的视频链接放在这里，之后可以在网页管理面板里继续添加。</p>
+            <strong>打开链接</strong>
           </a>
         </div>
       </section>
 
-      <section class="section diary-section" id="diary" aria-labelledby="diary-title">
-        <div class="section-heading">
-          <p class="eyebrow" data-reveal>手帐板块</p>
-          <h2 id="diary-title" data-reveal>给灵感、进度和复盘留一点柔软的位置。</h2>
+      <section class="section collections-section" id="collections" aria-labelledby="collections-title">
+        <div class="section-heading collection-heading feature-heading">
+          <p class="eyebrow" data-reveal>收藏小盒</p>
+          <h2 id="collections-title" data-reveal>把一组图、灵感和小收藏，收进更安静的小抽屉。</h2>
+          <p class="section-heading-note" data-reveal>一组图片、一点灵感，点开后像抽屉一样在小窝里展开。</p>
+          <div class="section-meta-row" data-reveal aria-label="收藏小盒概览">
+            <span>
+              <i data-lucide="archive" aria-hidden="true"></i>
+              Picture Box
+            </span>
+            <span><strong data-content-collection-count>2</strong> 个小盒正在展示</span>
+            <span>点开后保持 BGM 和小桃</span>
+          </div>
         </div>
-        <div class="diary-board">
-          <article class="diary-note" data-reveal>
-            <span>01</span>
-            <h3>月度作品复盘</h3>
-            <p>记录完成度、喜欢的部分、下次想试的构图和配色。</p>
-          </article>
-          <article class="diary-note" data-reveal>
-            <span>02</span>
-            <h3>游戏进度手帐</h3>
-            <p>把抽卡、养成、路线、截图和待做任务放在同一处。</p>
-          </article>
-          <article class="diary-note" data-reveal>
-            <span>03</span>
-            <h3>灵感收藏夹</h3>
-            <p>保存喜欢的封面、房间、配色、字体和小组件想法。</p>
-          </article>
+
+        <div class="collection-grid" data-content-collection-grid>
+          <button class="collection-card tilt-card" type="button" data-content-detail="collection-stickers" data-reveal>
+            <img src="./img/card.png" alt="" loading="lazy" decoding="async" />
+            <span>Sticker Pack</span>
+            <h3>超可爱表情包</h3>
+            <p>把喜欢的贴纸、表情包和小图收成一盒彩色糖纸。</p>
+          </button>
+          <button class="collection-card tilt-card" type="button" data-content-detail="collection-drafts" data-reveal>
+            <img src="./img/cc3/cc3_1.jpg" alt="" loading="lazy" decoding="async" />
+            <span>Picture Notes</span>
+            <h3>画稿与灵感</h3>
+            <p>一些像拍立得一样散开的稿件、截图和灵感碎片。</p>
+          </button>
+        </div>
+      </section>
+
+      <section class="section picture-entry-section" id="pictures" aria-labelledby="pictures-title">
+        <div class="section-heading picture-heading feature-heading">
+          <p class="eyebrow" data-reveal>图片小盒</p>
+          <h2 id="pictures-title" data-reveal>把喜欢的图片轻轻撒在桌面上，像一叠会呼吸的小拍立得。</h2>
+          <p class="section-heading-note" data-reveal>打开图片墙时，相纸会一张张落下；平时只安静地待在那里。</p>
+          <div class="section-meta-row" data-reveal aria-label="图片墙概览">
+            <span>
+              <i data-lucide="image" aria-hidden="true"></i>
+              Picture Wall
+            </span>
+            <span><strong data-content-picture-count>7</strong>张相纸摆在墙上</span>
+            <span>支持展开成沉浸图片墙</span>
+          </div>
+        </div>
+        <div class="picture-entry-wrap" data-reveal>
+          <a
+            class="picture-entry-card tilt-card"
+            href="#pictures-wall"
+            data-view-template="pictures-view-template"
+            data-view-title="小桃图片墙"
+            data-view-path="#pictures-wall"
+            aria-label="打开小桃图片墙"
+          >
+            <img src="./img/card.png" alt="小桃图片墙入口封面" loading="lazy" decoding="async" />
+            <span class="picture-entry-glow" aria-hidden="true"></span>
+          </a>
         </div>
       </section>
 
       <section class="contact-section" id="contact" aria-labelledby="contact-title">
         <div class="contact-card" data-reveal>
-          <div class="contact-card-header">
-            <p class="eyebrow">联系方式</p>
-            <h2 id="contact-title">把想法轻轻递过来。</h2>
-            <p>约稿、同好、碎碎念，都可以从这里慢慢找到我。</p>
-          </div>
-          <div class="contact-actions">
-            <div class="contact-group" aria-label="无需跳转的联系方式">
-              <p class="contact-group-label">常驻联系方式</p>
-              <div class="contact-list">
-              <span class="contact-item contact-static">
-                <i data-lucide="message-circle" aria-hidden="true"></i>
-                <span>
-                  <small>QQ</small>
-                  <strong>727880194</strong>
-                </span>
-              </span>
-              <span class="contact-item contact-static">
-                <i data-lucide="gamepad-2" aria-hidden="true"></i>
-                <span>
-                  <small>最终幻想14</small>
-                  <strong>水汽白桃@沃仙曦染</strong>
-                </span>
-              </span>
-              <span class="contact-item contact-static">
-                <i data-lucide="shopping-bag" aria-hidden="true"></i>
-                <span>
-                  <small>闲鱼</small>
-                  <strong>乐座灯草</strong>
-                </span>
-              </span>
-              </div>
+          <button class="contact-mini-button" type="button" data-contact-mini-trigger aria-label="让小人说哼哼">
+            <img class="contact-mini" src="./img/mini.png" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+          </button>
+          <span class="contact-mini-speech" data-contact-mini-speech aria-live="polite" aria-hidden="true">哼哼~</span>
+          <img class="contact-fei" src="./img/fei.png" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+          <div class="contact-card-copy">
+            <div class="contact-card-header">
+              <p class="eyebrow">找到我</p>
+              <h2 id="contact-title">看看我平时在做什么~</h2>
+              <p>我平时会在这些平台上分享我的创作和日常</p>
             </div>
-            <div class="contact-group" aria-label="可跳转的联系方式">
-              <p class="contact-group-label">可以直接过去看看</p>
-              <div class="contact-list contact-list-links">
-              <a class="contact-item contact-link magnetic" href="https://huajia.163.com/main/profile/VEgXGxbr" target="_blank" rel="noreferrer">
-                <i data-lucide="palette" aria-hidden="true"></i>
-                <span>
-                  <small>画加</small>
-                  <strong>主页与橱窗</strong>
-                </span>
+            <div class="contact-actions" aria-label="可跳转的平台链接">
+              <a class="contact-platform is-primary magnetic" href="https://huajia.163.com/main/profile/VEgXGxbr" target="_blank" rel="noreferrer" aria-label="打开画加主页与橱窗">
+                <span class="contact-platform-icon"><i data-lucide="palette" aria-hidden="true"></i></span>
+                <span>画加</span>
               </a>
-              <a class="contact-item contact-link magnetic" href="https://www.xiaohongshu.com/user/profile/601e59e000000000010098f1?xsec_token=ABtOTNomCprkyUEmGgLlmFQfFdMyrcpdhAE20CodsGjzs%3D&amp;xsec_source=pc_search" target="_blank" rel="noreferrer">
-                <i data-lucide="external-link" aria-hidden="true"></i>
-                <span>
-                  <small>小红书</small>
-                  <strong>暴击单盾</strong>
-                </span>
+              <a class="contact-platform magnetic" href="https://www.xiaohongshu.com/user/profile/601e59e000000000010098f1?xsec_token=ABtOTNomCprkyUEmGgLlmFQfFdMyrcpdhAE20CodsGjzs%3D&amp;xsec_source=pc_search" target="_blank" rel="noreferrer" aria-label="打开小红书主页">
+                <span class="contact-platform-icon"><i data-lucide="sparkles" aria-hidden="true"></i></span>
+                <span>小红书</span>
               </a>
-              <a class="contact-item contact-link magnetic" href="https://space.bilibili.com/7315220?spm_id_from=333.337.0.0" target="_blank" rel="noreferrer">
-                <i data-lucide="external-link" aria-hidden="true"></i>
-                <span>
-                  <small>bilibili</small>
-                  <strong>主页</strong>
-                </span>
+              <a class="contact-platform magnetic" href="https://space.bilibili.com/7315220?spm_id_from=333.337.0.0" target="_blank" rel="noreferrer" aria-label="打开 bilibili 视频主页">
+                <span class="contact-platform-icon"><i data-lucide="play" aria-hidden="true"></i></span>
+                <span>bilibili</span>
               </a>
-              </div>
             </div>
           </div>
         </div>
@@ -431,14 +444,150 @@
       <div class="guide-view-backdrop" data-guide-close aria-hidden="true"></div>
       <div class="guide-view-shell" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="guide-view-title">
         <div class="guide-view-topbar">
-          <button class="guide-view-close" type="button" data-guide-close aria-label="返回攻略库">
+          <button class="guide-view-close" type="button" data-guide-close aria-label="返回小窝">
             <i data-lucide="arrow-left" aria-hidden="true"></i>
-            <span>返回攻略库</span>
+            <span>返回小窝</span>
           </button>
-          <span id="guide-view-title">攻略详情</span>
+          <span id="guide-view-title">内容详情</span>
         </div>
         <p class="guide-view-status" data-guide-status role="alert" aria-live="polite"></p>
         <div class="guide-view-content" data-guide-content tabindex="-1"></div>
+      </div>
+    </section>
+
+    <template id="pictures-view-template">
+      <section class="picture-wall" data-picture-wall>
+        <input type="file" accept="image/*" multiple hidden data-picture-input />
+        <div class="picture-nav" aria-label="图片墙状态">
+          <span class="picture-nav-current" aria-current="page">
+            <i data-lucide="images" aria-hidden="true"></i>
+            <strong>图片墙</strong>
+          </span>
+          <span class="picture-nav-count" data-picture-wall-count>0 张</span>
+          <button class="picture-window-toggle" type="button" data-picture-fullscreen aria-label="展开图片墙窗口" aria-pressed="false">
+            <i data-lucide="maximize-2" aria-hidden="true"></i>
+            <span>展开</span>
+          </button>
+          <button class="picture-return-inline" type="button" data-picture-return aria-label="返回小窝">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>
+            <span>返回</span>
+          </button>
+        </div>
+        <div class="picture-actions" data-picture-editor aria-label="图片墙编辑">
+          <button class="picture-edit-toggle" type="button" data-picture-edit-toggle aria-expanded="false" aria-controls="picture-edit-menu">
+            <i data-lucide="sliders-horizontal" aria-hidden="true"></i>
+            <span>编辑</span>
+          </button>
+          <div class="picture-edit-menu" id="picture-edit-menu" data-picture-edit-menu>
+            <button type="button" data-picture-upload>上传图片</button>
+            <button type="button" data-picture-cancel>重置</button>
+            <button type="button" data-content-admin-open>管理内容</button>
+            <button class="picture-action-primary" type="button" data-picture-save>保存</button>
+          </div>
+        </div>
+        <div class="picture-stage" data-picture-stage aria-label="可拖动图片墙"></div>
+        <form class="picture-compose" data-picture-compose>
+          <label>
+            <span>描述</span>
+            <textarea data-picture-description rows="3" placeholder="这组图片的说明..."></textarea>
+          </label>
+          <button type="submit">添加空白卡</button>
+        </form>
+        <p class="picture-hint">拖动相纸可以调整位置；保存前请先在管理面板输入密钥。</p>
+      </section>
+    </template>
+
+    <section class="content-admin" data-content-admin hidden aria-hidden="true">
+      <div class="content-admin-backdrop" data-content-admin-close aria-hidden="true"></div>
+      <div class="content-admin-shell" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="content-admin-title">
+        <div class="content-admin-topbar">
+          <div>
+            <p class="eyebrow">网站内容管理</p>
+            <h2 id="content-admin-title">像填表一样更新小窝。</h2>
+          </div>
+          <button type="button" data-content-admin-close aria-label="关闭内容管理">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="content-admin-grid">
+          <form class="content-admin-panel" data-admin-media-form>
+            <h3>添加视频 / 图文攻略</h3>
+            <label>
+              <span>标题</span>
+              <input name="title" required placeholder="例如：新的绘画流程" />
+            </label>
+            <label>
+              <span>类型</span>
+              <select name="type">
+                <option value="video">视频链接</option>
+                <option value="article">图文攻略</option>
+                <option value="guide">已有攻略页</option>
+                <option value="link">普通链接</option>
+              </select>
+            </label>
+            <label>
+              <span>链接</span>
+              <input name="url" placeholder="粘贴 B 站 / 小红书 / 攻略页面链接" />
+            </label>
+            <label>
+              <span>分类 / 标签</span>
+              <input name="category" placeholder="video / art / game / life" />
+            </label>
+            <label>
+              <span>封面链接</span>
+              <input name="cover" placeholder="可自动读取，也可手动粘贴图片地址" />
+            </label>
+            <label>
+              <span>简介</span>
+              <textarea name="description" rows="3" placeholder="这张卡片要显示的短说明"></textarea>
+            </label>
+            <label>
+              <span>正文</span>
+              <textarea name="body" rows="5" placeholder="图文攻略正文；视频链接可以留空"></textarea>
+            </label>
+            <div class="content-admin-actions">
+              <button type="button" data-admin-fetch-cover>读取链接封面</button>
+              <button type="button" data-admin-upload-cover>上传封面</button>
+              <button class="content-admin-primary" type="submit">添加到首页</button>
+            </div>
+          </form>
+
+          <form class="content-admin-panel" data-admin-collection-form>
+            <h3>添加可点开的图片小盒</h3>
+            <label>
+              <span>小盒标题</span>
+              <input name="title" required placeholder="例如：超可爱表情包" />
+            </label>
+            <label>
+              <span>封面链接</span>
+              <input name="cover" placeholder="可上传，也可粘贴图片地址" />
+            </label>
+            <label>
+              <span>说明</span>
+              <textarea name="description" rows="3" placeholder="点开小盒前看到的说明"></textarea>
+            </label>
+            <label>
+              <span>子页面图片</span>
+              <input name="images" type="file" accept="image/*" multiple />
+            </label>
+            <div class="content-admin-actions">
+              <button type="button" data-admin-upload-collection-cover>上传封面</button>
+              <button class="content-admin-primary" type="submit">添加小盒</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="content-admin-list" data-admin-current-list aria-label="当前页面内容"></div>
+
+        <form class="content-admin-save" data-admin-save-form>
+          <label>
+            <span>管理密钥</span>
+            <input name="key" type="password" autocomplete="current-password" placeholder="只需要在保存时输入" />
+          </label>
+          <button class="content-admin-primary" type="submit">保存到网站</button>
+          <p data-admin-status role="status" aria-live="polite"></p>
+        </form>
       </div>
     </section>
 

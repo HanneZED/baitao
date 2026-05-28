@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-28T00:00:00.000Z",
+  "media": [
+    {
+      "id": "media-starlight-route",
+      "type": "guide",
+      "category": "game",
+      "title": "星光地图收集路线",
+      "description": "适合记录开放世界每日路线、材料收集、传送点顺序和高收益绕路。",
+      "url": "./guides/starlight-route.html",
+      "cover": "./assets/work-guide.svg",
+      "tags": "game route collect openworld",
+      "body": ""
+    },
+    {
+      "id": "media-brush-workflow",
+      "type": "guide",
+      "category": "art",
+      "title": "插画笔刷与上色流程",
+      "description": "从草稿、线稿、铺色、阴影到导出的个人绘画流程模板。",
+      "url": "./guides/brush-workflow.html",
+      "cover": "./assets/work-illustration.svg",
+      "tags": "art brush workflow illustration",
+      "body": ""
+    },
+    {
+      "id": "media-cozy-desk",
+      "type": "guide",
+      "category": "life",
+      "title": "可爱桌面布置清单",
+      "description": "小灯、收纳、背景布、拍照角度和桌面维护节奏。",
+      "url": "./guides/cozy-desk.html",
+      "cover": "./assets/work-room.svg",
+      "tags": "life room photo setup",
+      "body": ""
+    },
+    {
+      "id": "media-bilibili-home",
+      "type": "video",
+      "category": "video",
+      "title": "bilibili 主页",
+      "description": "把适合展示的视频链接放在这里，之后可以在网页管理面板里继续添加。",
+      "url": "https://space.bilibili.com/7315220?spm_id_from=333.337.0.0",
+      "cover": "./img/card.png",
+      "tags": "video bilibili works",
+      "body": ""
+    }
+  ],
+  "collections": [
+    {
+      "id": "collection-stickers",
+      "title": "超可爱表情包",
+      "description": "把喜欢的贴纸、表情包和小图收成一盒彩色糖纸。",
+      "cover": "./img/card.png",
+      "items": [
+        {
+          "src": "./img/cc3/ff1.png",
+          "title": "软软的小表情",
+          "description": "可以继续在网页里上传更多图片。"
+        },
+        {
+          "src": "./img/cc3/ff2.png",
+          "title": "贴纸二号",
+          "description": "点开卡片后会在本站展开，不会打断 BGM。"
+        },
+        {
+          "src": "./img/cc3/ff3.png",
+          "title": "贴纸三号",
+          "description": "适合做表情包合集或作品小图集。"
+        }
+      ]
+    },
+    {
+      "id": "collection-drafts",
+      "title": "画稿与灵感",
+      "description": "一些像拍立得一样散开的稿件、截图和灵感碎片。",
+      "cover": "./img/cc3/cc3_1.jpg",
+      "items": [
+        {
+          "src": "./img/cc3/cc3_1.jpg",
+          "title": "软乎乎的小画稿",
+          "description": "灵感先轻轻放在这里。"
+        },
+        {
+          "src": "./img/cc3/cc3_2.jpg",
+          "title": "夹在纸页里的灵感",
+          "description": "后续可以直接在网页里替换。"
+        },
+        {
+          "src": "./img/cc3/cc3_3.jpg",
+          "title": "像贴纸一样贴上去",
+          "description": "小图集会自动排版成子页面。"
+        }
+      ]
+    }
+  ],
+  "pictures": [
+    {
+      "id": "cc3-1",
+      "src": "./img/cc3/cc3_1.jpg",
+      "title": "软乎乎的小画稿",
+      "description": "软乎乎的小画稿。",
+      "x": 38,
+      "y": 13,
+      "rotation": -18
+    },
+    {
+      "id": "cc3-2",
+      "src": "./img/cc3/cc3_2.jpg",
+      "title": "夹在纸页里的灵感",
+      "description": "夹在纸页里的灵感。",
+      "x": 47,
+      "y": 9,
+      "rotation": 14
+    },
+    {
+      "id": "card-cover",
+      "src": "./img/card.png",
+      "title": "今天也把可爱收好",
+      "description": "今天也把可爱收好。",
+      "x": 38,
+      "y": 29,
+      "rotation": 7,
+      "size": "large"
+    },
+    {
+      "id": "cc3-3",
+      "src": "./img/cc3/cc3_3.jpg",
+      "title": "像贴纸一样贴上去",
+      "description": "像贴纸一样贴上去。",
+      "x": 55,
+      "y": 34,
+      "rotation": -10
+    },
+    {
+      "id": "cc3-4",
+      "src": "./img/cc3/cc3_4.jpg",
+      "title": "拖一拖，换个角度",
+      "description": "拖一拖，换个角度。",
+      "x": 30,
+      "y": 43,
+      "rotation": -14
+    },
+    {
+      "id": "cc3-5",
+      "src": "./img/cc3/cc3_5.jpg",
+      "title": "小小的收藏角落",
+      "description": "小小的收藏角落。",
+      "x": 60,
+      "y": 51,
+      "rotation": 18
+    },
+    {
+      "id": "cc3-6",
+      "src": "./img/cc3/cc3_6.jpg",
+      "title": "再偷偷添一张",
+      "description": "再偷偷添一张。",
+      "x": 67,
+      "y": 28,
+      "rotation": 12
+    }
+  ]
+}

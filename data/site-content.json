@@ -1,7 +1,18 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T10:22:49.039Z",
+  "updatedAt": "2026-05-28T10:25:00.096Z",
   "media": [
+    {
+      "id": "media-mppcjp6k-o2f1gn",
+      "type": "video",
+      "category": "video",
+      "title": "亲友送的母肥摆摆摆件",
+      "description": "开摆！",
+      "url": "https://www.bilibili.com/video/BV18j411C797/?spm_id_from=333.1387.homepage.video_card.click",
+      "cover": "./img/uploads/1779963899588-e269362b.webp",
+      "tags": "video video",
+      "body": "鱼老师送的！@Yuer"
+    },
     {
       "id": "media-mppc8g2f-o2ax75",
       "type": "article",

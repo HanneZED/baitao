@@ -120,10 +120,30 @@ function normalizePictureItem(item) {
   };
 }
 
+function normalizeSiteObject(value) {
+  if (Array.isArray(value)) return value.map((item) => normalizeSiteObject(item)).filter((item) => item !== "");
+  if (value && typeof value === "object") {
+    const next = {};
+    for (const [key, item] of Object.entries(value)) next[key] = normalizeSiteObject(item);
+    if (Array.isArray(next.showcaseImages)) next.showcaseImages = next.showcaseImages.map((item) => normalizeString(item)).filter(Boolean).slice(0, 6);
+    return next;
+  }
+  return normalizeString(value);
+}
+
+function normalizeBgmTrack(track) {
+  return {
+    title: normalizeString(track.title, "新 BGM") || "新 BGM",
+    src: normalizeString(track.src),
+  };
+}
+
 function normalizeContent(payload) {
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
+    site: normalizeSiteObject(payload.site || {}),
+    bgm: Array.isArray(payload.bgm) ? payload.bgm.map(normalizeBgmTrack).filter((track) => track.src) : [],
     media: Array.isArray(payload.media) ? payload.media.map(normalizeMediaItem) : [],
     collections: Array.isArray(payload.collections) ? payload.collections.map(normalizeCollection) : [],
     pictures: Array.isArray(payload.pictures) ? payload.pictures.map(normalizePictureItem).filter((item) => item.src) : [],

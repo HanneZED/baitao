@@ -285,6 +285,10 @@ function setupAnimeLoops() {
 function setupHeroArtworkSlider() {
   const slider = document.querySelector(".hero-artwork-slider");
   if (!slider) return;
+  if (slider.dataset.heroSliderTimer) {
+    window.clearInterval(Number(slider.dataset.heroSliderTimer));
+    delete slider.dataset.heroSliderTimer;
+  }
 
   const slides = [...slider.querySelectorAll(".hero-artwork-slide")];
   if (slides.length <= 1) return;
@@ -308,9 +312,9 @@ function setupHeroArtworkSlider() {
   sync();
 
   if (!reducedMotion) {
-    window.setInterval(() => {
+    slider.dataset.heroSliderTimer = String(window.setInterval(() => {
       show((active + 1) % slides.length);
-    }, 5200);
+    }, 5200));
   }
 }
 
@@ -319,8 +323,13 @@ function setupShowcaseSliders() {
   if (!sliders.length) return;
 
   sliders.forEach((slider, sliderIndex) => {
+    if (slider.dataset.showcaseSliderTimer) {
+      window.clearInterval(Number(slider.dataset.showcaseSliderTimer));
+      delete slider.dataset.showcaseSliderTimer;
+    }
     const slides = [...slider.querySelectorAll(".showcase-slide")];
     const dotsWrap = slider.querySelector(".showcase-dots");
+    dotsWrap?.replaceChildren();
     if (slides.length <= 1) return;
 
     const dots = slides.map((_, index) => {
@@ -371,10 +380,12 @@ function setupShowcaseSliders() {
     const stop = () => {
       if (timer) window.clearInterval(timer);
       timer = null;
+      delete slider.dataset.showcaseSliderTimer;
     };
     const start = () => {
       if (!reducedMotion && !timer) {
         timer = window.setInterval(next, 5200 + sliderIndex * 650);
+        slider.dataset.showcaseSliderTimer = String(timer);
       }
     };
     const restart = () => {
@@ -539,6 +550,121 @@ function setupContactMiniSpeech() {
 
 const defaultSiteContent = {
   version: 1,
+  site: {
+    brand: {
+      name: "肥窝",
+      subtitle: "水汽白桃的橱窗",
+      navWorks: "作品",
+      navGuides: "攻略",
+      navContact: "联系",
+    },
+    hero: {
+      eyebrow: "水汽白桃的个人小窝",
+      titleLine1: "一个普普通通",
+      titleLine2: "小画师的",
+      titleLine3: "小窝",
+      lede: "这里轻轻收着橱窗作品、视频攻略、绘画流程和一点点图片小盒。还在慢慢长大，但每一格都会尽量整理得柔软、清楚、好翻。",
+      primaryCta: "翻一翻攻略",
+      secondaryCta: "看橱窗作品",
+      cardRibbon: "画风 & 个人作品 展示",
+      cardName: "水汽白桃",
+      cardDescription: "一个喜欢各种各样小东西的小小母肥",
+    },
+    status: {
+      title: "小窝状态",
+      note: "个人状态 / 排单情况 / 约稿状态",
+      personalValue: "慢慢营业中",
+      personalLabel: "个人状态",
+      queueValue: "按顺序排队",
+      queueLabel: "排单情况",
+      commissionValue: "开放中",
+      commissionLabel: "约稿状态",
+    },
+    works: {
+      eyebrow: "橱窗链接",
+      title: "把作品和约稿信息放在一张安静的小卡里。",
+      note: "样图、价格和说明都收在这里，需要时可以轻轻点开。",
+      ribbon: "画稿 & 个人作品 展示",
+      price: "40 RMB",
+      cardTitle: "【洛克王国】二值笔全身qq人+精灵",
+      cardDescription: "加价服务清单\n宠物一只 ¥8\n\n试营试营\n需要您发送光线充足下全身图片+小体型精灵\n有什么需求和我沟通就好\n如果时间空闲基本3～5天出\n流程：确定草稿→成图\n\n无特殊要求默认展示，感谢约稿！",
+      linkLabel: "打开橱窗",
+    },
+    guides: {
+      eyebrow: "应用 & 视频",
+      title: "这些都是好东西哦，我一个人反复看了好多次！",
+      note: "把常用链接和小记录分门别类放好，翻找时不打扰页面的呼吸。",
+      searchPlaceholder: "搜索视频、攻略或标签",
+      filterAll: "全部",
+      filterVideo: "视频",
+      filterGuide: "攻略",
+      filterGame: "游戏",
+      filterArt: "绘画",
+      filterLife: "生活",
+    },
+    collections: {
+      eyebrow: "收藏小盒",
+      title: "把一组图、灵感和小收藏，收进更安静的小抽屉。",
+      note: "一组图片、一点灵感，点开后像抽屉一样在小窝里展开。",
+      metaLabel: "Picture Box",
+      countSuffix: "个小盒正在展示",
+      keepNote: "点开后保持 BGM 和小桃",
+      cardKicker: "Picture Box",
+    },
+    pictures: {
+      eyebrow: "图片小盒",
+      title: "把喜欢的图片轻轻撒在桌面上，像一叠会呼吸的小拍立得。",
+      note: "打开图片墙时，相纸会一张张落下；平时只安静地待在那里。",
+      metaLabel: "Picture Wall",
+      countSuffix: "张相纸摆在墙上",
+      featureNote: "支持展开成沉浸图片墙",
+      wallTitle: "小桃图片墙",
+      expandLabel: "展开",
+      shrinkLabel: "缩小",
+      editLabel: "编辑",
+      resetLabel: "重置",
+      saveLabel: "保存",
+      composeLabel: "相纸文字",
+      composePlaceholder: "先写照片下方的文字，再上传图片或添加空白卡",
+      uploadLabel: "上传带文字照片",
+      blankLabel: "添加空白卡",
+      hint: "点击相纸可以预览；拖动相纸可以调整位置；保存前请先输入管理密钥。",
+    },
+    contact: {
+      miniSpeech: "哼哼~",
+      eyebrow: "找到我",
+      title: "看看我平时在做什么~",
+      note: "我平时会在这些平台上分享我的创作和日常",
+      huajiaLabel: "画加",
+      xiaohongshuLabel: "小红书",
+      bilibiliLabel: "bilibili",
+    },
+    footer: {
+      left: "肥窝 | 水汽白桃   power by 温尔文雅",
+      center: "power by 温尔文雅（QQ：1129474282）",
+      right: "橱窗 / 攻略 / 个人小窝",
+    },
+    showcaseImages: [
+      "./img/cc1/cc1_1.jpg",
+      "./img/cc1/cc1_2.jpg",
+      "./img/cc1/cc1_3.jpg",
+      "./img/cc1/cc1_4.jpg",
+    ],
+  },
+  bgm: [
+    {
+      title: "幽冥水底",
+      src: "./sound/BGM/幽冥水底.mp3",
+    },
+    {
+      title: "サンタは中央線でやってくる",
+      src: "./sound/BGM/サンタは中央線でやってくる.flac",
+    },
+    {
+      title: "2：23 AM",
+      src: "./sound/BGM/2：23 AM.ogg",
+    },
+  ],
   media: [
     {
       id: "media-starlight-route",
@@ -627,6 +753,8 @@ function setupContentManager() {
   if (!mediaGrid && !collectionGrid && !admin) return;
   const mediaForm = admin?.querySelector("[data-admin-media-form]");
   const collectionForm = admin?.querySelector("[data-admin-collection-form]");
+  const siteForm = admin?.querySelector("[data-admin-site-form]");
+  const bgmForm = admin?.querySelector("[data-admin-bgm-form]");
   const saveForm = admin?.querySelector("[data-admin-save-form]");
   const adminToast = admin?.querySelector("[data-admin-toast]");
 
@@ -643,6 +771,97 @@ function setupContentManager() {
     if (category === "life") return "生活记录";
     return "内容卡片";
   };
+  const mediaCategories = [
+    { value: "video", label: "视频" },
+    { value: "guide", label: "攻略" },
+    { value: "game", label: "游戏" },
+    { value: "art", label: "绘画" },
+    { value: "life", label: "生活" },
+    { value: "article", label: "图文" },
+    { value: "link", label: "链接" },
+  ];
+  const siteTextFields = [
+    { path: "brand.name", label: "站点名称", selector: ".brand-copy strong" },
+    { path: "brand.subtitle", label: "站点副标题", selector: ".brand-copy small" },
+    { path: "brand.navWorks", label: "导航：作品", selector: '.main-nav a[href="#works"]' },
+    { path: "brand.navGuides", label: "导航：攻略", selector: '.main-nav a[href="#guides"]' },
+    { path: "brand.navContact", label: "导航：联系", selector: '.main-nav a[href="#contact"]' },
+    { path: "hero.eyebrow", label: "首页眉标", selector: ".hero-copy .eyebrow" },
+    { path: "hero.titleLine1", label: "首页大标题 1", selector: ".hero-title span:nth-child(1)" },
+    { path: "hero.titleLine2", label: "首页大标题 2", selector: ".hero-title span:nth-child(2)" },
+    { path: "hero.titleLine3", label: "首页大标题 3", selector: ".hero-title span:nth-child(3)" },
+    { path: "hero.lede", label: "首页简介", selector: ".hero-lede", type: "textarea" },
+    { path: "hero.primaryCta", label: "首页主按钮", selector: ".hero-actions .button-primary span" },
+    { path: "hero.secondaryCta", label: "首页次按钮", selector: ".hero-actions .button-ghost span" },
+    { path: "hero.cardRibbon", label: "首页展示卡标签", selector: ".hero-card .card-ribbon" },
+    { path: "hero.cardName", label: "首页展示卡名称", selector: ".hero-card-copy strong" },
+    { path: "hero.cardDescription", label: "首页展示卡说明", selector: ".hero-card-copy span" },
+    { path: "status.title", label: "状态栏标题", selector: ".status-category-title span:last-child" },
+    { path: "status.note", label: "状态栏说明", selector: ".status-category-note" },
+    { path: "status.personalValue", label: "个人状态值", selector: ".status-item:nth-child(1) strong" },
+    { path: "status.personalLabel", label: "个人状态标签", selector: ".status-item:nth-child(1) span:not(.status-icon)" },
+    { path: "status.queueValue", label: "排单状态值", selector: ".status-item:nth-child(2) strong" },
+    { path: "status.queueLabel", label: "排单状态标签", selector: ".status-item:nth-child(2) span:not(.status-icon)" },
+    { path: "status.commissionValue", label: "约稿状态值", selector: ".status-item:nth-child(3) strong" },
+    { path: "status.commissionLabel", label: "约稿状态标签", selector: ".status-item:nth-child(3) span:not(.status-icon)" },
+    { path: "works.eyebrow", label: "橱窗眉标", selector: "#works .section-heading .eyebrow" },
+    { path: "works.title", label: "橱窗大标题", selector: "#works-title", type: "textarea" },
+    { path: "works.note", label: "橱窗副标题", selector: "#works .section-heading-note", type: "textarea" },
+    { path: "works.price", label: "橱窗价格", selector: ".showcase-card > div:last-child > span" },
+    { path: "works.cardTitle", label: "橱窗卡标题", selector: ".showcase-card h3", type: "textarea" },
+    { path: "works.cardDescription", label: "橱窗卡说明", selector: ".showcase-card .service-list", type: "textarea" },
+    { path: "works.linkLabel", label: "橱窗按钮文字", selector: ".showcase-card .work-link span" },
+    { path: "guides.eyebrow", label: "应用视频眉标", selector: "#guides .section-heading .eyebrow" },
+    { path: "guides.title", label: "应用视频大标题", selector: "#guides-title", type: "textarea" },
+    { path: "guides.note", label: "应用视频副标题", selector: "#guides .section-heading-note", type: "textarea" },
+    { path: "guides.searchPlaceholder", label: "应用视频搜索提示", selector: "#guide-search", attr: "placeholder" },
+    { path: "guides.filterAll", label: "筛选：全部", selector: '[data-filter="all"]' },
+    { path: "guides.filterVideo", label: "筛选：视频", selector: '[data-filter="video"]' },
+    { path: "guides.filterGuide", label: "筛选：攻略", selector: '[data-filter="guide"]' },
+    { path: "guides.filterGame", label: "筛选：游戏", selector: '[data-filter="game"]' },
+    { path: "guides.filterArt", label: "筛选：绘画", selector: '[data-filter="art"]' },
+    { path: "guides.filterLife", label: "筛选：生活", selector: '[data-filter="life"]' },
+    { path: "collections.eyebrow", label: "收藏小盒眉标", selector: "#collections .section-heading .eyebrow" },
+    { path: "collections.title", label: "收藏小盒大标题", selector: "#collections-title", type: "textarea" },
+    { path: "collections.note", label: "收藏小盒副标题", selector: "#collections .section-heading-note", type: "textarea" },
+    { path: "collections.keepNote", label: "收藏小盒提示", selector: "#collections .section-meta-row span:nth-child(3)" },
+    { path: "collections.cardKicker", label: "小盒卡片标签" },
+    { path: "pictures.eyebrow", label: "图片墙眉标", selector: "#pictures .section-heading .eyebrow" },
+    { path: "pictures.title", label: "图片墙大标题", selector: "#pictures-title", type: "textarea" },
+    { path: "pictures.note", label: "图片墙副标题", selector: "#pictures .section-heading-note", type: "textarea" },
+    { path: "pictures.featureNote", label: "图片墙提示", selector: "#pictures .section-meta-row span:nth-child(3)" },
+    { path: "pictures.wallTitle", label: "图片墙子页标题", selector: '[data-view-template="pictures-view-template"]', attr: "data-view-title" },
+    { path: "pictures.expandLabel", label: "图片墙展开按钮" },
+    { path: "pictures.shrinkLabel", label: "图片墙缩小按钮" },
+    { path: "pictures.editLabel", label: "图片墙编辑按钮", selector: "[data-picture-edit-toggle] span" },
+    { path: "pictures.resetLabel", label: "图片墙重置按钮", selector: "[data-picture-cancel]" },
+    { path: "pictures.saveLabel", label: "图片墙保存按钮", selector: "[data-picture-save]" },
+    { path: "pictures.composeLabel", label: "图片墙文字标签", selector: ".picture-compose label > span" },
+    { path: "pictures.composePlaceholder", label: "图片墙输入提示", selector: "[data-picture-description]", attr: "placeholder", type: "textarea" },
+    { path: "pictures.uploadLabel", label: "图片上传按钮", selector: "[data-picture-upload]" },
+    { path: "pictures.blankLabel", label: "空白卡按钮", selector: ".picture-compose button[type='submit']" },
+    { path: "pictures.hint", label: "图片墙底部提示", selector: ".picture-hint", type: "textarea" },
+    { path: "contact.miniSpeech", label: "联系小人气泡", selector: ".contact-mini-speech" },
+    { path: "contact.eyebrow", label: "联系眉标", selector: ".contact-card-header .eyebrow" },
+    { path: "contact.title", label: "联系大标题", selector: "#contact-title", type: "textarea" },
+    { path: "contact.note", label: "联系说明", selector: ".contact-card-header > p:not(.eyebrow)", type: "textarea" },
+    { path: "contact.huajiaLabel", label: "联系按钮：画加", selector: ".contact-actions .contact-platform:nth-child(1) span:last-child" },
+    { path: "contact.xiaohongshuLabel", label: "联系按钮：小红书", selector: ".contact-actions .contact-platform:nth-child(2) span:last-child" },
+    { path: "contact.bilibiliLabel", label: "联系按钮：bilibili", selector: ".contact-actions .contact-platform:nth-child(3) span:last-child" },
+    { path: "footer.left", label: "页脚左侧", selector: ".site-footer span:nth-child(1)" },
+    { path: "footer.center", label: "页脚中间", selector: ".site-footer span:nth-child(2)" },
+    { path: "footer.right", label: "页脚右侧", selector: ".site-footer span:nth-child(3)" },
+  ];
+  const getPath = (source, path) => path.split(".").reduce((value, key) => (value && Object.hasOwn(value, key) ? value[key] : undefined), source);
+  const setPath = (target, path, value) => {
+    const keys = path.split(".");
+    const last = keys.pop();
+    const host = keys.reduce((object, key) => {
+      object[key] = object[key] && typeof object[key] === "object" ? object[key] : {};
+      return object[key];
+    }, target);
+    host[last] = value;
+  };
 
   let siteContent = clone(defaultSiteContent);
   let lastSavedContent = clone(defaultSiteContent);
@@ -650,6 +869,7 @@ function setupContentManager() {
   let editingCollectionId = "";
   let collectionEditDraftItems = [];
   let adminToastTimer = null;
+  let hasUnsavedChanges = false;
 
   const normalizeMedia = (item) => ({
     id: normalizeText(item.id, uniqueId("media")),
@@ -690,9 +910,30 @@ function setupContentManager() {
     size: item.size === "large" ? "large" : undefined,
   });
 
+  const normalizeSite = (site = {}) => {
+    const next = clone(defaultSiteContent.site);
+    siteTextFields.forEach((field) => {
+      setPath(next, field.path, normalizeText(getPath(site, field.path), getPath(defaultSiteContent.site, field.path)));
+    });
+    next.showcaseImages = Array.isArray(site.showcaseImages)
+      ? site.showcaseImages.map((item) => normalizeText(item)).filter(Boolean).slice(0, 6)
+      : clone(defaultSiteContent.site.showcaseImages);
+    if (!next.showcaseImages.length) next.showcaseImages = clone(defaultSiteContent.site.showcaseImages);
+    return next;
+  };
+
+  const normalizeBgmTrack = (track = {}) => ({
+    title: normalizeText(track.title, "新 BGM"),
+    src: normalizeText(track.src),
+  });
+
   const normalizeContent = (content) => ({
     version: 1,
     updatedAt: content.updatedAt || new Date().toISOString(),
+    site: normalizeSite(content.site),
+    bgm: Array.isArray(content.bgm)
+      ? content.bgm.map(normalizeBgmTrack).filter((track) => track.src)
+      : clone(defaultSiteContent.bgm),
     media: Array.isArray(content.media) ? content.media.map(normalizeMedia) : clone(defaultSiteContent.media),
     collections: Array.isArray(content.collections) ? content.collections.map(normalizeCollection) : clone(defaultSiteContent.collections),
     pictures: Array.isArray(content.pictures) ? content.pictures.map(normalizePicture).filter((item) => item.src) : clone(defaultSiteContent.pictures),
@@ -736,7 +977,6 @@ function setupContentManager() {
         <span>${escapeHtml(mediaLabel(item.type, item.category))}</span>
         <h3>${escapeHtml(item.title)}</h3>
         <p>${escapeHtml(item.description)}</p>
-        <strong>${item.type === "video" ? "打开视频" : "查看详情"}</strong>
       `;
       mediaGrid.append(link);
     });
@@ -758,6 +998,135 @@ function setupContentManager() {
       `;
       collectionGrid.append(card);
     });
+  };
+
+  const renderShowcaseImages = () => {
+    const images = (siteContent.site.showcaseImages || defaultSiteContent.site.showcaseImages).slice(0, 6);
+    const heroSlider = document.querySelector(".hero-artwork-slider");
+    if (heroSlider) {
+      heroSlider.replaceChildren(
+        ...images.map((src, index) => {
+          const image = document.createElement("img");
+          image.className = `hero-artwork-slide${index === 0 ? " is-active" : ""}`;
+          image.src = src;
+          image.alt = `橱窗示例 ${index + 1}`;
+          image.loading = index === 0 ? "eager" : "lazy";
+          image.decoding = "async";
+          return image;
+        }),
+      );
+    }
+    document.querySelectorAll(".showcase-carousel").forEach((carousel) => {
+      if (carousel.dataset.showcaseSliderTimer) window.clearInterval(Number(carousel.dataset.showcaseSliderTimer));
+      const nextCarousel = carousel.cloneNode(false);
+      const dots = document.createElement("div");
+      dots.className = "showcase-dots";
+      dots.setAttribute("aria-label", "选择橱窗示例");
+      nextCarousel.replaceChildren(
+        ...images.map((src, index) => {
+          const image = document.createElement("img");
+          image.className = `showcase-slide${index === 0 ? " is-active" : ""}`;
+          image.src = src;
+          image.alt = "";
+          image.loading = "lazy";
+          image.decoding = "async";
+          return image;
+        }),
+        dots,
+      );
+      carousel.replaceWith(nextCarousel);
+    });
+  };
+
+  const applyTextField = (field, root = document) => {
+    if (!field.selector) return;
+    const value = getPath(siteContent.site, field.path);
+    root.querySelectorAll(field.selector).forEach((target) => {
+      if (field.attr) {
+        target.setAttribute(field.attr, value);
+        return;
+      }
+      target.textContent = value;
+    });
+  };
+
+  const applyIconText = (selector, value, root = document) => {
+    root.querySelectorAll(selector).forEach((target) => {
+      const icon = target.querySelector("i, svg");
+      target.replaceChildren();
+      if (icon) target.append(icon);
+      target.append(` ${value}`);
+    });
+  };
+
+  const applySiteText = (root = document) => {
+    siteTextFields.forEach((field) => applyTextField(field, root));
+    applyIconText("#collections .section-meta-row span:nth-child(1)", getPath(siteContent.site, "collections.metaLabel"), root);
+    applyIconText("#pictures .section-meta-row span:nth-child(1)", getPath(siteContent.site, "pictures.metaLabel"), root);
+    root.querySelectorAll(".collection-card > span").forEach((item) => {
+      item.textContent = getPath(siteContent.site, "collections.cardKicker");
+    });
+    root.querySelectorAll("[data-picture-fullscreen]").forEach((button) => {
+      const expanded = button.getAttribute("aria-pressed") === "true";
+      const label = expanded ? getPath(siteContent.site, "pictures.shrinkLabel") : getPath(siteContent.site, "pictures.expandLabel");
+      const span = button.querySelector("span");
+      if (span) span.textContent = label;
+      button.setAttribute("aria-label", expanded ? "缩小图片墙窗口" : "展开图片墙窗口");
+    });
+  };
+
+  const renderSiteTextEditor = () => {
+    const fields = siteForm?.querySelector("[data-admin-site-fields]");
+    if (fields) {
+      fields.innerHTML = siteTextFields
+        .map((field) => {
+          const value = getPath(siteContent.site, field.path) ?? "";
+          const input =
+            field.type === "textarea"
+              ? `<textarea name="${escapeHtml(field.path)}" rows="3">${escapeHtml(value)}</textarea>`
+              : `<input name="${escapeHtml(field.path)}" value="${escapeHtml(value)}" />`;
+          return `
+            <label>
+              <span>${escapeHtml(field.label)}</span>
+              ${input}
+            </label>
+          `;
+        })
+        .join("");
+    }
+    renderShowcaseEditor();
+  };
+
+  const readBgmFromEditor = () =>
+    [...(bgmForm?.querySelectorAll("[data-admin-bgm-row]") || [])]
+      .map((row) =>
+        normalizeBgmTrack({
+          title: row.querySelector('[name="bgmTitle"]')?.value,
+          src: row.querySelector('[name="bgmSrc"]')?.value,
+        }),
+      )
+      .filter((track) => track.src);
+
+  const renderBgmEditor = () => {
+    const list = bgmForm?.querySelector("[data-admin-bgm-list]");
+    if (!list) return;
+    list.innerHTML = siteContent.bgm
+      .map(
+        (track, index) => `
+          <div class="admin-bgm-row" data-admin-bgm-row>
+            <label>
+              <span>BGM 名字</span>
+              <input name="bgmTitle" value="${escapeHtml(track.title)}" placeholder="例如：幽冥水底" />
+            </label>
+            <label>
+              <span>音频文件路径 / 链接</span>
+              <input name="bgmSrc" value="${escapeHtml(track.src)}" placeholder="./sound/BGM/xxx.mp3" />
+            </label>
+            <button type="button" data-admin-remove-bgm="${index}">移除</button>
+          </div>
+        `,
+      )
+      .join("");
   };
 
   const renderAdminList = () => {
@@ -786,11 +1155,21 @@ function setupContentManager() {
   };
 
   const syncContentMetrics = () => {
+    const collectionSuffix = getPath(siteContent.site, "collections.countSuffix") || "个小盒正在展示";
+    const pictureSuffix = getPath(siteContent.site, "pictures.countSuffix") || "张相纸摆在墙上";
     document.querySelectorAll("[data-content-collection-count]").forEach((item) => {
       item.textContent = String(siteContent.collections.length);
+      const wrap = item.parentElement;
+      if (wrap) {
+        wrap.replaceChildren(item, ` ${collectionSuffix}`);
+      }
     });
     document.querySelectorAll("[data-content-picture-count]").forEach((item) => {
       item.textContent = String(siteContent.pictures.length);
+      const wrap = item.parentElement;
+      if (wrap) {
+        wrap.replaceChildren(item, pictureSuffix);
+      }
     });
     document.querySelectorAll("[data-picture-wall-count]").forEach((item) => {
       item.textContent = `${siteContent.pictures.length} 张`;
@@ -798,11 +1177,17 @@ function setupContentManager() {
   };
 
   const renderAll = () => {
+    renderShowcaseImages();
     renderMediaCards();
     renderCollectionCards();
+    applySiteText();
     renderAdminList();
+    renderSiteTextEditor();
+    renderBgmEditor();
     syncContentMetrics();
     bootIcons();
+    setupHeroArtworkSlider();
+    setupShowcaseSliders();
     setupTiltCards();
     document.dispatchEvent(new CustomEvent("kawaii:content-rendered"));
   };
@@ -813,10 +1198,12 @@ function setupContentManager() {
       if (!response.ok) throw new Error("content file missing");
       siteContent = normalizeContent(await response.json());
       lastSavedContent = clone(siteContent);
+      hasUnsavedChanges = false;
       renderAll();
     } catch {
       siteContent = normalizeContent(defaultSiteContent);
       lastSavedContent = clone(siteContent);
+      hasUnsavedChanges = false;
       renderAll();
     } finally {
       window.kawaiiContentReady = true;
@@ -824,12 +1211,15 @@ function setupContentManager() {
     }
   };
 
+  const markAdminDirty = (message = "已更新到页面预览。确认没问题后点“保存到网站”。") => {
+    hasUnsavedChanges = true;
+    renderAll();
+    setAdminStatus(message, "success");
+  };
+
   const getAdminKey = () => {
-    const saved = sessionStorage.getItem("kawaii-admin-key") || "";
     const field = admin?.querySelector('[name="key"]');
-    const current = field?.value?.trim() || saved;
-    if (current) sessionStorage.setItem("kawaii-admin-key", current);
-    return current;
+    return field?.value?.trim() || "";
   };
 
   const setAdminStatus = (message, tone = "") => {
@@ -863,6 +1253,68 @@ function setupContentManager() {
     const field = form?.elements?.[name];
     if (!field) return;
     field.value = value ?? "";
+  };
+
+  const readSiteTextEditor = () => {
+    const data = new FormData(siteForm);
+    const nextSite = normalizeSite(siteContent.site);
+    siteTextFields.forEach((field) => {
+      if (!data.has(field.path)) return;
+      setPath(nextSite, field.path, normalizeText(data.get(field.path), getPath(defaultSiteContent.site, field.path)));
+    });
+    return nextSite;
+  };
+
+  const readShowcaseImagesFromEditor = () =>
+    [...(siteForm?.querySelectorAll("[data-admin-showcase-row]") || [])]
+      .map((row) => normalizeText(row.querySelector('[name="showcaseImage"]')?.value))
+      .filter(Boolean)
+      .slice(0, 6);
+
+  const renderShowcaseEditor = () => {
+    const list = siteForm?.querySelector("[data-admin-showcase-list]");
+    if (!list) return;
+    const images = (siteContent.site.showcaseImages || []).slice(0, 6);
+    list.innerHTML = images
+      .map(
+        (src, index) => `
+          <div class="admin-showcase-row" data-admin-showcase-row>
+            <img src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async" />
+            <label>
+              <span>轮播图片 ${index + 1}</span>
+              <input name="showcaseImage" value="${escapeHtml(src)}" placeholder="./img/cc1/cc1_4.jpg" />
+            </label>
+            <button type="button" data-admin-remove-showcase="${index}">移除</button>
+          </div>
+        `,
+      )
+      .join("");
+    const addButton = siteForm?.querySelector("[data-admin-add-showcase]");
+    if (addButton) addButton.disabled = images.length >= 6;
+  };
+
+  const appendShowcaseEditorRow = (src = "") => {
+    const list = siteForm?.querySelector("[data-admin-showcase-list]");
+    if (!list) return;
+    const count = list.querySelectorAll("[data-admin-showcase-row]").length;
+    if (count >= 6) {
+      setAdminStatus("轮播图片最多 6 张。", "error");
+      return;
+    }
+    const row = document.createElement("div");
+    row.className = "admin-showcase-row";
+    row.dataset.adminShowcaseRow = "";
+    row.innerHTML = `
+      <img src="${escapeHtml(src || "./img/card.png")}" alt="" loading="lazy" decoding="async" />
+      <label>
+        <span>轮播图片 ${count + 1}</span>
+        <input name="showcaseImage" value="${escapeHtml(src)}" placeholder="./img/cc1/cc1_4.jpg" />
+      </label>
+      <button type="button" data-admin-remove-showcase="${count}">移除</button>
+    `;
+    list.append(row);
+    const addButton = siteForm?.querySelector("[data-admin-add-showcase]");
+    if (addButton) addButton.disabled = count + 1 >= 6;
   };
 
   const resetMediaEditor = () => {
@@ -992,7 +1444,16 @@ function setupContentManager() {
     admin.hidden = false;
     admin.setAttribute("aria-hidden", "false");
     const keyField = admin.querySelector('[name="key"]');
-    if (keyField && !keyField.value) keyField.value = sessionStorage.getItem("kawaii-admin-key") || "";
+    if (keyField) {
+      keyField.value = "";
+      keyField.type = "password";
+    }
+    const keyToggle = admin.querySelector("[data-admin-toggle-key]");
+    if (keyToggle) {
+      keyToggle.setAttribute("aria-pressed", "false");
+      keyToggle.setAttribute("aria-label", "显示管理密钥");
+      keyToggle.innerHTML = '<i data-lucide="eye" aria-hidden="true"></i>';
+    }
     document.body.classList.add("is-content-admin-open");
     setSmoothScrollPaused(true);
     bootIcons();
@@ -1028,7 +1489,13 @@ function setupContentManager() {
       if (!response.ok) throw new Error(data.error || "保存失败");
       siteContent = normalizeContent(data);
       lastSavedContent = clone(siteContent);
+      hasUnsavedChanges = false;
       renderAll();
+      const keyField = admin?.querySelector('[name="key"]');
+      if (keyField) {
+        keyField.value = "";
+        keyField.type = "password";
+      }
       setAdminStatus("保存成功。Vercel 通常会在几十秒内自动更新线上页面。", "success");
       return true;
     } catch (error) {
@@ -1167,9 +1634,11 @@ function setupContentManager() {
       if (fullscreenButton) {
         fullscreenButton.setAttribute("aria-pressed", String(expanded));
         fullscreenButton.setAttribute("aria-label", expanded ? "缩小图片墙窗口" : "展开图片墙窗口");
+        const expandLabel = getPath(siteContent.site, "pictures.expandLabel") || "展开";
+        const shrinkLabel = getPath(siteContent.site, "pictures.shrinkLabel") || "缩小";
         fullscreenButton.innerHTML = expanded
-          ? '<i data-lucide="minimize-2" aria-hidden="true"></i><span>缩小</span>'
-          : '<i data-lucide="maximize-2" aria-hidden="true"></i><span>展开</span>';
+          ? `<i data-lucide="minimize-2" aria-hidden="true"></i><span>${escapeHtml(shrinkLabel)}</span>`
+          : `<i data-lucide="maximize-2" aria-hidden="true"></i><span>${escapeHtml(expandLabel)}</span>`;
       }
       bootIcons();
     };
@@ -1409,6 +1878,39 @@ function setupContentManager() {
   };
 
   admin?.addEventListener("click", (event) => {
+    const removeShowcase = event.target.closest("[data-admin-remove-showcase]");
+    if (removeShowcase) {
+      const images = readShowcaseImagesFromEditor();
+      images.splice(Number(removeShowcase.dataset.adminRemoveShowcase), 1);
+      siteContent.site = readSiteTextEditor();
+      siteContent.site.showcaseImages = images;
+      markAdminDirty("已从轮播图预览里移除。确认没问题后点“保存到网站”。");
+      return;
+    }
+
+    if (event.target.closest("[data-admin-add-showcase]")) {
+      appendShowcaseEditorRow();
+      return;
+    }
+
+    const removeBgm = event.target.closest("[data-admin-remove-bgm]");
+    if (removeBgm) {
+      const tracks = readBgmFromEditor();
+      tracks.splice(Number(removeBgm.dataset.adminRemoveBgm), 1);
+      siteContent.bgm = tracks.length ? tracks : clone(defaultSiteContent.bgm);
+      markAdminDirty("已从 BGM 预览列表里移除。确认没问题后点“保存到网站”。");
+      return;
+    }
+
+    if (event.target.closest("[data-admin-add-bgm]")) {
+      const tracks = readBgmFromEditor();
+      tracks.push({ title: "新 BGM", src: "" });
+      siteContent.bgm = tracks;
+      renderBgmEditor();
+      setAdminStatus("已添加一行 BGM，填好路径后点“更新 BGM 预览”。", "loading");
+      return;
+    }
+
     const editButton = event.target.closest("[data-admin-edit]");
     if (editButton) {
       const type = editButton.dataset.adminEdit;
@@ -1447,8 +1949,7 @@ function setupContentManager() {
       if (type === "collection") siteContent.collections = siteContent.collections.filter((item) => item.id !== id);
       if (id === editingMediaId) resetMediaEditor();
       if (id === editingCollectionId) resetCollectionEditor();
-      renderAll();
-      setAdminStatus("已从页面预览移除。确认没问题后点“保存到网站”。", "success");
+      markAdminDirty("已从页面预览移除。确认没问题后点“保存到网站”。");
       return;
     }
     if (event.target.closest("[data-content-admin-close]")) closeAdmin();
@@ -1479,6 +1980,12 @@ function setupContentManager() {
     const [file] = await pickFile(false);
     if (!file) return;
     admin.querySelector('[data-admin-collection-form] [name="cover"]').value = await fileToDataUrl(file);
+  });
+
+  admin?.querySelector("[data-admin-upload-showcase]")?.addEventListener("click", async () => {
+    const [file] = await pickFile(false);
+    if (!file) return;
+    appendShowcaseEditorRow(await fileToDataUrl(file));
   });
 
   admin?.querySelector("[data-admin-toggle-key]")?.addEventListener("click", (event) => {
@@ -1542,8 +2049,26 @@ function setupContentManager() {
       siteContent.media.unshift(nextItem);
     }
     resetMediaEditor();
-    renderAll();
-    setAdminStatus(wasEditing ? "已更新到页面预览。确认没问题后点“保存到网站”。" : "已添加到页面预览。确认没问题后点“保存到网站”。", "success");
+    markAdminDirty(wasEditing ? "已更新到页面预览。确认没问题后点“保存到网站”。" : "已添加到页面预览。确认没问题后点“保存到网站”。");
+  });
+
+  siteForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    siteContent.site = readSiteTextEditor();
+    siteContent.site.showcaseImages = readShowcaseImagesFromEditor().slice(0, 6);
+    if (!siteContent.site.showcaseImages.length) siteContent.site.showcaseImages = clone(defaultSiteContent.site.showcaseImages);
+    markAdminDirty("网页文字和轮播图已更新到页面预览。确认没问题后点“保存到网站”。");
+  });
+
+  bgmForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const tracks = readBgmFromEditor();
+    if (!tracks.length) {
+      setAdminStatus("请至少保留一首 BGM，并填写音频路径。", "error");
+      return;
+    }
+    siteContent.bgm = tracks;
+    markAdminDirty("BGM 列表已更新到页面预览。确认没问题后点“保存到网站”。");
   });
 
   collectionForm?.addEventListener("submit", async (event) => {
@@ -1577,8 +2102,7 @@ function setupContentManager() {
       siteContent.collections.unshift(nextItem);
     }
     resetCollectionEditor();
-    renderAll();
-    setAdminStatus(wasEditing ? "小盒已更新到页面预览。确认没问题后点“保存到网站”。" : "小盒已添加到页面预览。确认没问题后点“保存到网站”。", "success");
+    markAdminDirty(wasEditing ? "小盒已更新到页面预览。确认没问题后点“保存到网站”。" : "小盒已添加到页面预览。确认没问题后点“保存到网站”。");
   });
 
   saveForm?.addEventListener("submit", async (event) => {
@@ -1587,6 +2111,7 @@ function setupContentManager() {
   });
 
   window.kawaiiContent = {
+    applySiteText,
     createDetail,
     getContent: () => siteContent,
     mountDynamicView,
@@ -1609,7 +2134,7 @@ function setupMusicPlayer() {
   if (!player || !audio || !toggle || !volume) return;
 
   const defaultVolume = 0.1;
-  const tracks = [
+  let tracks = window.kawaiiContent?.getContent?.().bgm?.length ? window.kawaiiContent.getContent().bgm : [
     {
       title: "幽冥水底",
       src: "./sound/BGM/幽冥水底.mp3",
@@ -1637,10 +2162,12 @@ function setupMusicPlayer() {
     toggle.setAttribute("aria-label", isPlaying ? "暂停背景音乐" : "播放背景音乐");
   };
 
-  const loadTrack = (index) => {
+  const loadTrack = (index, { preserveSrc = false } = {}) => {
+    if (!tracks.length) return;
+    const previousSrc = audio.src;
     activeTrack = (index + tracks.length) % tracks.length;
     const track = tracks[activeTrack];
-    audio.src = track.src;
+    if (!preserveSrc || !previousSrc.endsWith(track.src.replace(/^\.\//, ""))) audio.src = track.src;
     localStorage.setItem("kawaii-bgm-track", activeTrack.toString());
     if (title) title.textContent = track.title;
   };
@@ -1677,6 +2204,15 @@ function setupMusicPlayer() {
   volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
     localStorage.setItem("kawaii-bgm-volume", audio.volume.toString());
+  });
+
+  document.addEventListener("kawaii:content-rendered", () => {
+    const nextTracks = window.kawaiiContent?.getContent?.().bgm || [];
+    if (!nextTracks.length) return;
+    const currentSrc = tracks[activeTrack]?.src;
+    tracks = nextTracks;
+    const matchedIndex = tracks.findIndex((track) => track.src === currentSrc);
+    loadTrack(matchedIndex >= 0 ? matchedIndex : Math.min(activeTrack, tracks.length - 1), { preserveSrc: true });
   });
 
   const getPlayerSize = () => {
@@ -2528,6 +3064,7 @@ function setupGuideView() {
     document.title = `${viewTitle} | 肥窝`;
     content.scrollTop = 0;
     content.focus({ preventScroll: true });
+    window.kawaiiContent?.applySiteText?.(content);
     window.kawaiiContent?.mountDynamicView?.(content);
     bootIcons();
 

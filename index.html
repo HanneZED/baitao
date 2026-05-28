@@ -183,6 +183,13 @@
               loading="lazy"
               decoding="async"
             />
+            <img
+              class="hero-artwork-slide"
+              src="./img/cc1/cc1_4.jpg"
+              alt="【洛克王国】二值笔全身qq人+精灵橱窗示例四"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div class="hero-card-copy">
             <strong>水汽白桃</strong>
@@ -262,6 +269,7 @@
               <img class="showcase-slide is-active" src="./img/cc1/cc1_1.jpg" alt="" loading="lazy" decoding="async" />
               <img class="showcase-slide" src="./img/cc1/cc1_2.jpg" alt="" loading="lazy" decoding="async" />
               <img class="showcase-slide" src="./img/cc1/cc1_3.jpg" alt="" loading="lazy" decoding="async" />
+              <img class="showcase-slide" src="./img/cc1/cc1_4.jpg" alt="" loading="lazy" decoding="async" />
               <div class="showcase-dots" aria-label="选择【洛克王国】橱窗示例"></div>
             </div>
             <div>
@@ -318,28 +326,24 @@
             <span>游戏攻略</span>
             <h3>星光地图收集路线</h3>
             <p>适合记录开放世界每日路线、材料收集、传送点顺序和高收益绕路。</p>
-            <strong>查看详情</strong>
           </a>
           <a class="guide-card media-card tilt-card" href="./guides/brush-workflow.html" data-tags="guide art brush workflow illustration" data-reveal>
             <img src="./assets/work-illustration.svg" alt="" loading="lazy" decoding="async" />
             <span>绘画攻略</span>
             <h3>插画笔刷与上色流程</h3>
             <p>从草稿、线稿、铺色、阴影到导出的个人绘画流程模板。</p>
-            <strong>查看详情</strong>
           </a>
           <a class="guide-card media-card tilt-card" href="./guides/cozy-desk.html" data-tags="guide life room photo setup" data-reveal>
             <img src="./assets/work-room.svg" alt="" loading="lazy" decoding="async" />
             <span>生活攻略</span>
             <h3>可爱桌面布置清单</h3>
             <p>小灯、收纳、背景布、拍照角度和桌面维护节奏。</p>
-            <strong>查看详情</strong>
           </a>
           <a class="guide-card media-card tilt-card" href="https://space.bilibili.com/7315220?spm_id_from=333.337.0.0" target="_blank" rel="noreferrer" data-tags="video bilibili works" data-reveal>
             <img src="./img/card.png" alt="" loading="lazy" decoding="async" />
             <span>视频链接</span>
             <h3>bilibili 主页</h3>
             <p>把适合展示的视频链接放在这里，之后可以在网页管理面板里继续添加。</p>
-            <strong>打开链接</strong>
           </a>
         </div>
       </section>
@@ -500,10 +504,78 @@
           </button>
         </div>
 
+        <form class="content-admin-save content-admin-savebar" data-admin-save-form>
+          <label>
+            <span>管理密钥</span>
+            <span class="admin-key-field">
+              <input name="key" type="password" autocomplete="off" placeholder="每次打开都会清空，只在保存时输入" />
+              <button type="button" data-admin-toggle-key aria-label="显示管理密钥" aria-pressed="false">
+                <i data-lucide="eye" aria-hidden="true"></i>
+              </button>
+            </span>
+          </label>
+          <button class="content-admin-primary" type="submit">保存到网站</button>
+          <p data-admin-status role="status" aria-live="polite"></p>
+        </form>
+
+        <nav class="content-admin-nav" aria-label="管理面板分区">
+          <a href="#admin-site-form">网页文字</a>
+          <a href="#admin-bgm-form">BGM</a>
+          <a href="#admin-media-form">应用 &amp; 视频</a>
+          <a href="#admin-collection-form">收藏小盒</a>
+          <a href="#admin-current-list">当前内容</a>
+        </nav>
+
         <div class="content-admin-grid">
-          <form class="content-admin-panel" data-admin-media-form>
+          <form class="content-admin-panel content-admin-panel-wide" data-admin-site-form id="admin-site-form">
+            <div class="content-admin-panel-heading">
+              <span class="content-admin-step">01</span>
+              <div>
+                <h3>网页文字与轮播图</h3>
+                <p>首页、各板块标题、副标题、按钮文字、页脚和两处橱窗轮播都在这里改。</p>
+              </div>
+            </div>
+            <div class="admin-showcase-editor">
+              <div>
+                <strong>轮播图片</strong>
+                <span>首页展示卡和橱窗卡共用同一组图片，最多 6 张。</span>
+              </div>
+              <div class="admin-showcase-list" data-admin-showcase-list></div>
+              <div class="content-admin-actions">
+                <button type="button" data-admin-add-showcase>添加一张轮播图</button>
+                <button type="button" data-admin-upload-showcase>上传轮播图</button>
+              </div>
+            </div>
+            <div class="admin-field-grid" data-admin-site-fields></div>
+            <div class="content-admin-actions">
+              <button class="content-admin-primary" type="submit">更新网页文字预览</button>
+            </div>
+          </form>
+
+          <form class="content-admin-panel content-admin-panel-wide" data-admin-bgm-form id="admin-bgm-form">
+            <div class="content-admin-panel-heading">
+              <span class="content-admin-step">02</span>
+              <div>
+                <h3>BGM 列表</h3>
+                <p>可修改 BGM 名字和音频路径，也可以继续添加新的 BGM。</p>
+              </div>
+            </div>
+            <div class="admin-bgm-list" data-admin-bgm-list></div>
+            <div class="content-admin-actions">
+              <button type="button" data-admin-add-bgm>添加 BGM</button>
+              <button class="content-admin-primary" type="submit">更新 BGM 预览</button>
+            </div>
+          </form>
+
+          <form class="content-admin-panel" data-admin-media-form id="admin-media-form">
             <input name="editId" type="hidden" />
-            <h3 data-admin-media-title>添加视频 / 图文攻略</h3>
+            <div class="content-admin-panel-heading">
+              <span class="content-admin-step">03</span>
+              <div>
+                <h3 data-admin-media-title>添加视频 / 图文攻略</h3>
+                <p>添加或编辑“应用 & 视频”里的卡片内容。</p>
+              </div>
+            </div>
             <label>
               <span>标题</span>
               <input name="title" required placeholder="例如：新的绘画流程" />
@@ -523,7 +595,15 @@
             </label>
             <label>
               <span>分类 / 标签</span>
-              <input name="category" placeholder="video / art / game / life" />
+              <select name="category">
+                <option value="video">视频</option>
+                <option value="guide">攻略</option>
+                <option value="game">游戏</option>
+                <option value="art">绘画</option>
+                <option value="life">生活</option>
+                <option value="article">图文</option>
+                <option value="link">链接</option>
+              </select>
             </label>
             <label>
               <span>封面链接</span>
@@ -545,9 +625,15 @@
             </div>
           </form>
 
-          <form class="content-admin-panel" data-admin-collection-form>
+          <form class="content-admin-panel" data-admin-collection-form id="admin-collection-form">
             <input name="editId" type="hidden" />
-            <h3 data-admin-collection-title>添加可点开的图片小盒</h3>
+            <div class="content-admin-panel-heading">
+              <span class="content-admin-step">04</span>
+              <div>
+                <h3 data-admin-collection-title>添加可点开的图片小盒</h3>
+                <p>小盒保存后也可以继续编辑文字、移除旧图或追加新图。</p>
+              </div>
+            </div>
             <label>
               <span>小盒标题</span>
               <input name="title" required placeholder="例如：超可爱表情包" />
@@ -573,21 +659,7 @@
           </form>
         </div>
 
-        <div class="content-admin-list" data-admin-current-list aria-label="当前页面内容"></div>
-
-        <form class="content-admin-save" data-admin-save-form>
-          <label>
-            <span>管理密钥</span>
-            <span class="admin-key-field">
-              <input name="key" type="password" autocomplete="current-password" placeholder="只需要在保存时输入" />
-              <button type="button" data-admin-toggle-key aria-label="显示管理密钥" aria-pressed="false">
-                <i data-lucide="eye" aria-hidden="true"></i>
-              </button>
-            </span>
-          </label>
-          <button class="content-admin-primary" type="submit">保存到网站</button>
-          <p data-admin-status role="status" aria-live="polite"></p>
-        </form>
+        <div class="content-admin-list" data-admin-current-list id="admin-current-list" aria-label="当前页面内容"></div>
       </div>
     </section>
 

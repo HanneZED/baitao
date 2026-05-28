@@ -149,6 +149,85 @@ npx --yes http-server D:\blog\kawaii-atelier -p 4173 -c-1
 http://127.0.0.1:4173/
 ```
 
+## 日常修改后怎么用 Git 更新线上
+
+这一段写给完全不熟 Git 的情况。平时如果你只用网页里的“网站内容管理”保存，系统会自动提交到 GitHub，通常不需要手动敲 Git。只有在你自己改了代码、图片文件、README 或样式时，才需要下面这些命令。
+
+### 1. 进入项目目录
+
+打开 PowerShell，输入：
+
+```powershell
+cd D:\blog\kawaii-atelier
+```
+
+### 2. 看看改了哪些文件
+
+```powershell
+git status
+```
+
+如果看到红色文件名，说明这些文件还没有加入本次提交。比如新加图片时，常会看到 `img/xxx.jpg`。
+
+### 3. 添加这次要提交的文件
+
+只添加你确定要更新的文件。比如改了网页逻辑、样式和内容数据：
+
+```powershell
+git add app.js styles.css data/site-content.json index.html README.md
+```
+
+如果这次新增了图片，也要把图片加进去，例如：
+
+```powershell
+git add img/cc1/cc1_4.jpg
+```
+
+不确定时不要用 `git add .`，避免把临时文件、测试截图或不想公开的文件一起提交。
+
+### 4. 写一条提交说明
+
+```powershell
+git commit -m "Update site content"
+```
+
+引号里的文字可以换成这次做了什么，例如：
+
+```powershell
+git commit -m "Improve admin panel"
+```
+
+### 5. 推送到 GitHub
+
+```powershell
+git push
+```
+
+推送成功后，Vercel 一般会自动部署。等待几十秒到几分钟，再刷新网站看效果。
+
+### 6. 如果 push 提示远端有新内容
+
+说明 GitHub 上已经有别人或网页管理系统提交过更新。先同步远端：
+
+```powershell
+git fetch origin main
+git rebase origin/main
+git push
+```
+
+如果 rebase 时出现冲突，不要乱删文件。先停下来，看 PowerShell 提示的是哪个文件冲突，再决定保留哪一边的内容。
+
+### 7. 常用安全检查
+
+提交前可以再看一眼：
+
+```powershell
+git status
+git diff --check
+```
+
+`git diff --check` 没有报错就比较安心。看到 `LF will be replaced by CRLF` 这种换行提示通常不用管。
+
 ## 文件大概放在哪里
 
 - `index.html`：首页结构。

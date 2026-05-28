@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T09:46:42.394Z",
+  "updatedAt": "2026-05-28T10:07:19.196Z",
   "media": [
     {
       "id": "media-mpp6lkjv-gnkrct",
@@ -17,12 +17,12 @@
       "id": "media-bilibili-home",
       "type": "video",
       "category": "video",
-      "title": "bilibili 主页",
-      "description": "把适合展示的视频链接放在这里，之后可以在网页管理面板里继续添加。",
-      "url": "https://space.bilibili.com/7315220?spm_id_from=333.337.0.0",
-      "cover": "./img/card.png",
-      "tags": "video bilibili works",
-      "body": ""
+      "title": "《藤本树17-26》",
+      "description": "好看！",
+      "url": "https://www.bilibili.com/video/BV1jwBvBpESE/?spm_id_from=333.788.top_right_bar_window_default_collection.content.click&vd_source=07b1acecc58ec889366fc8d99260ea89",
+      "cover": "./img/uploads/1779962838816-cba59532.webp",
+      "tags": "video video",
+      "body": "真的很优秀，六家工作室制作，每一集都是精品，都很有创意。"
     }
   ],
   "collections": [

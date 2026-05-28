@@ -625,6 +625,10 @@ function setupContentManager() {
   const collectionGrid = document.querySelector("[data-content-collection-grid]");
   const admin = document.querySelector("[data-content-admin]");
   if (!mediaGrid && !collectionGrid && !admin) return;
+  const mediaForm = admin?.querySelector("[data-admin-media-form]");
+  const collectionForm = admin?.querySelector("[data-admin-collection-form]");
+  const saveForm = admin?.querySelector("[data-admin-save-form]");
+  const adminToast = admin?.querySelector("[data-admin-toast]");
 
   const clone = (value) => JSON.parse(JSON.stringify(value));
   const escapeHtml = (value) =>
@@ -642,6 +646,10 @@ function setupContentManager() {
 
   let siteContent = clone(defaultSiteContent);
   let lastSavedContent = clone(defaultSiteContent);
+  let editingMediaId = "";
+  let editingCollectionId = "";
+  let collectionEditDraftItems = [];
+  let adminToastTimer = null;
 
   const normalizeMedia = (item) => ({
     id: normalizeText(item.id, uniqueId("media")),
@@ -756,8 +764,8 @@ function setupContentManager() {
     const list = admin?.querySelector("[data-admin-current-list]");
     if (!list) return;
     const rows = [
-      ...siteContent.media.map((item) => ({ type: "media", id: item.id, label: `内容：${item.title}` })),
-      ...siteContent.collections.map((item) => ({ type: "collection", id: item.id, label: `小盒：${item.title}` })),
+      ...siteContent.media.map((item) => ({ type: "media", id: item.id, label: `内容：${item.title}`, meta: mediaLabel(item.type, item.category) })),
+      ...siteContent.collections.map((item) => ({ type: "collection", id: item.id, label: `小盒：${item.title}`, meta: `${item.items.length} 张图片` })),
     ];
     list.innerHTML = `
       <h3>当前内容</h3>
@@ -765,8 +773,11 @@ function setupContentManager() {
         .map(
           (row) => `
             <div class="content-admin-list-row">
-              <span>${escapeHtml(row.label)}</span>
-              <button type="button" data-admin-remove="${escapeHtml(row.type)}" data-admin-remove-id="${escapeHtml(row.id)}">移除</button>
+              <span>${escapeHtml(row.label)} · ${escapeHtml(row.meta)}</span>
+              <div class="content-admin-row-actions">
+                <button type="button" data-admin-edit="${escapeHtml(row.type)}" data-admin-edit-id="${escapeHtml(row.id)}">编辑</button>
+                <button type="button" data-admin-remove="${escapeHtml(row.type)}" data-admin-remove-id="${escapeHtml(row.id)}">移除</button>
+              </div>
             </div>
           `,
         )
@@ -820,9 +831,157 @@ function setupContentManager() {
 
   const setAdminStatus = (message, tone = "") => {
     const status = admin?.querySelector("[data-admin-status]");
-    if (!status) return;
-    status.textContent = message;
-    status.dataset.tone = tone;
+    if (status) {
+      status.textContent = message;
+      status.dataset.tone = tone;
+    }
+    if (!adminToast) return;
+    window.clearTimeout(adminToastTimer);
+    adminToast.textContent = message;
+    adminToast.dataset.tone = tone;
+    if (!message) {
+      adminToast.classList.remove("is-visible");
+      adminToast.hidden = true;
+      return;
+    }
+    adminToast.hidden = false;
+    adminToast.getBoundingClientRect();
+    adminToast.classList.add("is-visible");
+    adminToastTimer = window.setTimeout(() => {
+      adminToast.classList.remove("is-visible");
+      window.setTimeout(() => {
+        if (adminToast.classList.contains("is-visible")) return;
+        adminToast.hidden = true;
+      }, 260);
+    }, 5000);
+  };
+
+  const setFormValue = (form, name, value = "") => {
+    const field = form?.elements?.[name];
+    if (!field) return;
+    field.value = value ?? "";
+  };
+
+  const resetMediaEditor = () => {
+    editingMediaId = "";
+    mediaForm?.reset();
+    setFormValue(mediaForm, "editId", "");
+    const title = admin?.querySelector("[data-admin-media-title]");
+    const label = admin?.querySelector("[data-admin-media-submit-label]");
+    const cancel = admin?.querySelector("[data-admin-cancel-media]");
+    if (title) title.textContent = "添加视频 / 图文攻略";
+    if (label) label.textContent = "添加到首页";
+    if (cancel) cancel.hidden = true;
+  };
+
+  const startMediaEdit = (id) => {
+    const item = siteContent.media.find((entry) => entry.id === id);
+    if (!item || !mediaForm) return;
+    editingMediaId = item.id;
+    setFormValue(mediaForm, "editId", item.id);
+    setFormValue(mediaForm, "title", item.title);
+    setFormValue(mediaForm, "type", item.type);
+    setFormValue(mediaForm, "url", item.url);
+    setFormValue(mediaForm, "category", item.category);
+    setFormValue(mediaForm, "cover", item.cover);
+    setFormValue(mediaForm, "description", item.description);
+    setFormValue(mediaForm, "body", item.body);
+    const title = admin?.querySelector("[data-admin-media-title]");
+    const label = admin?.querySelector("[data-admin-media-submit-label]");
+    const cancel = admin?.querySelector("[data-admin-cancel-media]");
+    if (title) title.textContent = "编辑视频 / 图文攻略";
+    if (label) label.textContent = "保存修改";
+    if (cancel) cancel.hidden = false;
+    mediaForm.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    setAdminStatus("正在编辑这张内容卡。修改后先保存到页面预览，再点“保存到网站”。", "loading");
+  };
+
+  const readCollectionDraftFromEditor = () => {
+    const editor = collectionForm?.querySelector("[data-admin-collection-items]");
+    if (!editor) return collectionEditDraftItems;
+    return [...editor.querySelectorAll("[data-collection-draft-index]")]
+      .map((row) => {
+        const index = Number(row.dataset.collectionDraftIndex);
+        const image = collectionEditDraftItems[index];
+        if (!image?.src) return null;
+        return {
+          src: image.src,
+          title: normalizeText(row.querySelector('[name="itemTitle"]')?.value, image.title || "图片"),
+          description: normalizeText(row.querySelector('[name="itemDescription"]')?.value, image.description),
+        };
+      })
+      .filter(Boolean);
+  };
+
+  const renderCollectionEditor = () => {
+    const editor = collectionForm?.querySelector("[data-admin-collection-items]");
+    if (!editor) return;
+    editor.hidden = !editingCollectionId;
+    if (!editingCollectionId) {
+      editor.replaceChildren();
+      return;
+    }
+    if (!collectionEditDraftItems.length) {
+      editor.innerHTML = "<strong>小盒里暂时没有图片，可以在下方继续上传。</strong>";
+      return;
+    }
+    editor.innerHTML = `
+      <strong>小盒内图片</strong>
+      ${collectionEditDraftItems
+        .map(
+          (image, index) => `
+            <div class="collection-item-editor-row" data-collection-draft-index="${index}">
+              <img src="${escapeHtml(image.src)}" alt="" loading="lazy" decoding="async" />
+              <div>
+                <label>
+                  <span>图片标题</span>
+                  <input name="itemTitle" value="${escapeHtml(image.title)}" />
+                </label>
+                <label>
+                  <span>图片说明</span>
+                  <textarea name="itemDescription" rows="2">${escapeHtml(image.description)}</textarea>
+                </label>
+              </div>
+              <button type="button" data-admin-remove-collection-image="${index}">移除</button>
+            </div>
+          `,
+        )
+        .join("")}
+    `;
+  };
+
+  const resetCollectionEditor = () => {
+    editingCollectionId = "";
+    collectionEditDraftItems = [];
+    collectionForm?.reset();
+    setFormValue(collectionForm, "editId", "");
+    const title = admin?.querySelector("[data-admin-collection-title]");
+    const label = admin?.querySelector("[data-admin-collection-submit-label]");
+    const cancel = admin?.querySelector("[data-admin-cancel-collection]");
+    if (title) title.textContent = "添加可点开的图片小盒";
+    if (label) label.textContent = "添加小盒";
+    if (cancel) cancel.hidden = true;
+    renderCollectionEditor();
+  };
+
+  const startCollectionEdit = (id) => {
+    const item = siteContent.collections.find((entry) => entry.id === id);
+    if (!item || !collectionForm) return;
+    editingCollectionId = item.id;
+    collectionEditDraftItems = clone(item.items);
+    setFormValue(collectionForm, "editId", item.id);
+    setFormValue(collectionForm, "title", item.title);
+    setFormValue(collectionForm, "cover", item.cover);
+    setFormValue(collectionForm, "description", item.description);
+    const title = admin?.querySelector("[data-admin-collection-title]");
+    const label = admin?.querySelector("[data-admin-collection-submit-label]");
+    const cancel = admin?.querySelector("[data-admin-cancel-collection]");
+    if (title) title.textContent = "编辑可点开的图片小盒";
+    if (label) label.textContent = "保存小盒修改";
+    if (cancel) cancel.hidden = false;
+    renderCollectionEditor();
+    collectionForm.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    setAdminStatus("正在编辑这个小盒。可以改文字、移除旧图，或继续上传新图片。", "loading");
   };
 
   const openAdmin = () => {
@@ -937,7 +1096,7 @@ function setupContentManager() {
   const setupPictureWall = (wall) => {
     const stage = wall.querySelector("[data-picture-stage]");
     const input = wall.querySelector("[data-picture-input]");
-    const uploadButton = wall.querySelector("[data-picture-upload]");
+    const uploadButtons = wall.querySelectorAll("[data-picture-upload]");
     const saveButton = wall.querySelector("[data-picture-save]");
     const resetButton = wall.querySelector("[data-picture-cancel]");
     const fullscreenButton = wall.querySelector("[data-picture-fullscreen]");
@@ -951,6 +1110,7 @@ function setupContentManager() {
     if (!stage) return;
 
     let isPictureEditing = false;
+    let suppressPicturePreview = false;
 
     const setPictureEditing = (editing) => {
       isPictureEditing = editing;
@@ -1017,6 +1177,63 @@ function setupContentManager() {
       return delay;
     };
 
+    const syncPictureRatio = (card, image) => {
+      const width = image.naturalWidth;
+      const height = image.naturalHeight;
+      if (!width || !height) return;
+      const ratio = Math.min(Math.max(width / height, 0.62), 1.68);
+      card.style.setProperty("--picture-ratio", ratio.toFixed(3));
+    };
+
+    const closePicturePreview = (overlay) => {
+      if (!overlay) return;
+      overlay.classList.remove("is-visible");
+      window.setTimeout(() => {
+        overlay.remove();
+        if (!document.querySelector(".picture-preview-overlay")) {
+          document.body.classList.remove("is-picture-preview-open");
+        }
+      }, 260);
+    };
+
+    const openPicturePreview = (item) => {
+      document.querySelectorAll(".picture-preview-overlay").forEach((overlay) => closePicturePreview(overlay));
+      const overlay = document.createElement("div");
+      overlay.className = "picture-preview-overlay";
+      overlay.setAttribute("role", "dialog");
+      overlay.setAttribute("aria-modal", "true");
+      overlay.setAttribute("aria-label", item.description || item.title || "图片预览");
+      overlay.innerHTML = `
+        <div class="picture-preview-dialog">
+          <button class="picture-preview-close" type="button" aria-label="关闭图片预览">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+          <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.title)}" />
+          <div class="picture-preview-caption">
+            <strong>${escapeHtml(item.title)}</strong>
+            ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+          </div>
+        </div>
+      `;
+      let keyClose = null;
+      const close = () => {
+        if (keyClose) window.removeEventListener("keydown", keyClose);
+        closePicturePreview(overlay);
+      };
+      keyClose = (event) => {
+        if (event.key !== "Escape") return;
+        close();
+      };
+      overlay.addEventListener("click", close);
+      overlay.querySelector(".picture-preview-dialog")?.addEventListener("click", (event) => event.stopPropagation());
+      overlay.querySelector(".picture-preview-close")?.addEventListener("click", close);
+      document.body.append(overlay);
+      document.body.classList.add("is-picture-preview-open");
+      bootIcons();
+      window.addEventListener("keydown", keyClose);
+      requestAnimationFrame(() => overlay.classList.add("is-visible"));
+    };
+
     const renderPictures = ({ animate = false } = {}) => {
       stage.replaceChildren();
       const displayPictures = focusPictures(siteContent.pictures);
@@ -1034,6 +1251,9 @@ function setupContentManager() {
           <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.title)}" draggable="false" />
           <p>${escapeHtml(item.description || item.title)}</p>
         `;
+        const image = card.querySelector("img");
+        if (image?.complete) syncPictureRatio(card, image);
+        image?.addEventListener("load", () => syncPictureRatio(card, image), { once: true });
         if (animate && !reducedMotion) {
           card.addEventListener("animationend", () => card.classList.add("is-settled"), { once: true });
         }
@@ -1047,11 +1267,13 @@ function setupContentManager() {
       const startIndex = siteContent.pictures.length;
       for (const [index, file] of files.entries()) {
         const dataUrl = await fileToDataUrl(file);
+        const caption = description?.value?.trim();
+        const fallback = file.name.replace(/\.[^.]+$/, "") || "新图片";
         siteContent.pictures.push({
           id: uniqueId("picture"),
           src: dataUrl,
-          title: file.name.replace(/\.[^.]+$/, "") || "新图片",
-          description: description?.value?.trim() || file.name.replace(/\.[^.]+$/, "") || "新图片",
+          title: caption || fallback,
+          description: caption || fallback,
           x: 34 + ((startIndex + index) % 5) * 7,
           y: 18 + ((startIndex + index) % 4) * 11,
           rotation: Math.round(-14 + Math.random() * 28),
@@ -1073,11 +1295,13 @@ function setupContentManager() {
         itemX: Number.parseFloat(card.style.getPropertyValue("--x")) || item.x,
         itemY: Number.parseFloat(card.style.getPropertyValue("--y")) || item.y,
       };
+      let didDrag = false;
       card.setPointerCapture?.(event.pointerId);
       card.classList.add("is-settled");
       card.classList.add("is-dragging");
 
       const move = (moveEvent) => {
+        if (Math.hypot(moveEvent.clientX - start.x, moveEvent.clientY - start.y) > 6) didDrag = true;
         const nextX = start.itemX + ((moveEvent.clientX - start.x) / stageRect.width) * 100;
         const nextY = start.itemY + ((moveEvent.clientY - start.y) / stageRect.height) * 100;
         item.x = Math.min(Math.max(nextX, 8), 92);
@@ -1089,6 +1313,12 @@ function setupContentManager() {
       const release = () => {
         card.classList.add("is-settled");
         card.classList.remove("is-dragging");
+        if (didDrag) {
+          suppressPicturePreview = true;
+          window.setTimeout(() => {
+            suppressPicturePreview = false;
+          }, 0);
+        }
         window.removeEventListener("pointermove", move);
         window.removeEventListener("pointerup", release);
         window.removeEventListener("pointercancel", release);
@@ -1101,11 +1331,17 @@ function setupContentManager() {
 
     stage.addEventListener("click", (event) => {
       const deleteButton = event.target.closest("[data-picture-delete]");
-      if (!deleteButton) return;
-      if (!isPictureEditing) return;
-      const card = deleteButton.closest(".picture-card");
-      siteContent.pictures = siteContent.pictures.filter((item) => item.id !== card?.dataset.pictureId);
-      renderPictures();
+      if (deleteButton) {
+        if (!isPictureEditing) return;
+        const card = deleteButton.closest(".picture-card");
+        siteContent.pictures = siteContent.pictures.filter((item) => item.id !== card?.dataset.pictureId);
+        renderPictures();
+        return;
+      }
+      const card = event.target.closest(".picture-card");
+      if (!card || suppressPicturePreview) return;
+      const item = siteContent.pictures.find((entry) => entry.id === card.dataset.pictureId);
+      if (item) openPicturePreview(item);
     });
 
     editToggle?.addEventListener("click", () => {
@@ -1121,7 +1357,9 @@ function setupContentManager() {
       document.querySelector("[data-guide-close]")?.click();
     });
 
-    uploadButton?.addEventListener("click", () => input?.click());
+    uploadButtons.forEach((button) => {
+      button.addEventListener("click", () => input?.click());
+    });
     input?.addEventListener("change", () => {
       addPictureFiles([...input.files]);
       input.value = "";
@@ -1167,12 +1405,44 @@ function setupContentManager() {
   };
 
   admin?.addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-admin-edit]");
+    if (editButton) {
+      const type = editButton.dataset.adminEdit;
+      const id = editButton.dataset.adminEditId;
+      if (type === "media") startMediaEdit(id);
+      if (type === "collection") startCollectionEdit(id);
+      return;
+    }
+
+    const removeCollectionImage = event.target.closest("[data-admin-remove-collection-image]");
+    if (removeCollectionImage) {
+      collectionEditDraftItems = readCollectionDraftFromEditor();
+      collectionEditDraftItems.splice(Number(removeCollectionImage.dataset.adminRemoveCollectionImage), 1);
+      renderCollectionEditor();
+      setAdminStatus("已从这个小盒的编辑预览里移除图片。", "success");
+      return;
+    }
+
+    if (event.target.closest("[data-admin-cancel-media]")) {
+      resetMediaEditor();
+      setAdminStatus("已退出内容卡编辑。", "success");
+      return;
+    }
+
+    if (event.target.closest("[data-admin-cancel-collection]")) {
+      resetCollectionEditor();
+      setAdminStatus("已退出小盒编辑。", "success");
+      return;
+    }
+
     const removeButton = event.target.closest("[data-admin-remove]");
     if (removeButton) {
       const type = removeButton.dataset.adminRemove;
       const id = removeButton.dataset.adminRemoveId;
       if (type === "media") siteContent.media = siteContent.media.filter((item) => item.id !== id);
       if (type === "collection") siteContent.collections = siteContent.collections.filter((item) => item.id !== id);
+      if (id === editingMediaId) resetMediaEditor();
+      if (id === editingCollectionId) resetCollectionEditor();
       renderAll();
       setAdminStatus("已从页面预览移除。确认没问题后点“保存到网站”。", "success");
       return;
@@ -1207,6 +1477,21 @@ function setupContentManager() {
     admin.querySelector('[data-admin-collection-form] [name="cover"]').value = await fileToDataUrl(file);
   });
 
+  admin?.querySelector("[data-admin-toggle-key]")?.addEventListener("click", (event) => {
+    const button = event.currentTarget;
+    const input = saveForm?.elements.key;
+    if (!input) return;
+    const shouldShow = input.type === "password";
+    input.type = shouldShow ? "text" : "password";
+    button.setAttribute("aria-pressed", String(shouldShow));
+    button.setAttribute("aria-label", shouldShow ? "隐藏管理密钥" : "显示管理密钥");
+    button.innerHTML = shouldShow
+      ? '<i data-lucide="eye-off" aria-hidden="true"></i>'
+      : '<i data-lucide="eye" aria-hidden="true"></i>';
+    bootIcons();
+    input.focus({ preventScroll: true });
+  });
+
   admin?.querySelector("[data-admin-fetch-cover]")?.addEventListener("click", async () => {
     const form = admin.querySelector("[data-admin-media-form]");
     const url = form?.elements.url.value.trim();
@@ -1228,36 +1513,43 @@ function setupContentManager() {
     }
   });
 
-  admin?.querySelector("[data-admin-media-form]")?.addEventListener("submit", (event) => {
+  mediaForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     const type = normalizeText(formData.get("type"), "article");
     const category = normalizeText(formData.get("category"), type);
-    siteContent.media.unshift(
-      normalizeMedia({
-        id: uniqueId("media"),
-        type,
-        category,
-        title: formData.get("title"),
-        url: formData.get("url"),
-        cover: formData.get("cover") || "./img/card.png",
-        description: formData.get("description"),
-        body: formData.get("body"),
-        tags: `${type} ${category}`,
-      }),
-    );
-    form.reset();
+    const wasEditing = Boolean(editingMediaId);
+    const nextItem = normalizeMedia({
+      id: editingMediaId || uniqueId("media"),
+      type,
+      category,
+      title: formData.get("title"),
+      url: formData.get("url"),
+      cover: formData.get("cover") || "./img/card.png",
+      description: formData.get("description"),
+      body: formData.get("body"),
+      tags: `${type} ${category}`,
+    });
+    if (editingMediaId) {
+      const index = siteContent.media.findIndex((item) => item.id === editingMediaId);
+      if (index >= 0) siteContent.media[index] = nextItem;
+    } else {
+      siteContent.media.unshift(nextItem);
+    }
+    resetMediaEditor();
     renderAll();
-    setAdminStatus("已添加到页面预览。确认没问题后点“保存到网站”。", "success");
+    setAdminStatus(wasEditing ? "已更新到页面预览。确认没问题后点“保存到网站”。" : "已添加到页面预览。确认没问题后点“保存到网站”。", "success");
   });
 
-  admin?.querySelector("[data-admin-collection-form]")?.addEventListener("submit", async (event) => {
+  collectionForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     const files = [...form.elements.images.files];
-    const images = [];
+    const wasEditing = Boolean(editingCollectionId);
+    const existingItems = editingCollectionId ? readCollectionDraftFromEditor() : [];
+    const images = [...existingItems];
     for (const file of files) {
       images.push({
         src: await fileToDataUrl(file),
@@ -1265,22 +1557,27 @@ function setupContentManager() {
         description: "",
       });
     }
-    const cover = normalizeText(formData.get("cover")) || images[0]?.src || "./img/card.png";
-    siteContent.collections.unshift(
-      normalizeCollection({
-        id: uniqueId("collection"),
-        title: formData.get("title"),
-        description: formData.get("description"),
-        cover,
-        items: images,
-      }),
-    );
-    form.reset();
+    const previous = siteContent.collections.find((item) => item.id === editingCollectionId);
+    const cover = normalizeText(formData.get("cover")) || images[0]?.src || previous?.cover || "./img/card.png";
+    const nextItem = normalizeCollection({
+      id: editingCollectionId || uniqueId("collection"),
+      title: formData.get("title"),
+      description: formData.get("description"),
+      cover,
+      items: images,
+    });
+    if (editingCollectionId) {
+      const index = siteContent.collections.findIndex((item) => item.id === editingCollectionId);
+      if (index >= 0) siteContent.collections[index] = nextItem;
+    } else {
+      siteContent.collections.unshift(nextItem);
+    }
+    resetCollectionEditor();
     renderAll();
-    setAdminStatus("小盒已添加到页面预览。确认没问题后点“保存到网站”。", "success");
+    setAdminStatus(wasEditing ? "小盒已更新到页面预览。确认没问题后点“保存到网站”。" : "小盒已添加到页面预览。确认没问题后点“保存到网站”。", "success");
   });
 
-  admin?.querySelector("[data-admin-save-form]")?.addEventListener("submit", async (event) => {
+  saveForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
     await saveSiteContent();
   });

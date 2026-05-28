@@ -70,15 +70,15 @@
     <a class="skip-link" href="#main">跳到主要内容</a>
 
     <header class="site-header" data-reveal>
-      <a class="brand" href="./index.html" aria-label="肥窝首页">
-        <span class="brand-badge">
+      <div class="brand" aria-label="肥窝首页">
+        <button class="brand-badge" type="button" data-content-admin-open aria-label="打开网站内容管理">
           <img src="./img/icon.jpg" alt="水汽白桃头像" />
-        </span>
-        <span>
+        </button>
+        <a class="brand-copy" href="./index.html" aria-label="肥窝首页">
           <strong>肥窝</strong>
           <small>水汽白桃的橱窗</small>
-        </span>
-      </a>
+        </a>
+      </div>
 
       <nav class="main-nav" aria-label="主导航">
         <a href="#works">作品</a>
@@ -308,10 +308,6 @@
               <button class="filter-chip" type="button" data-filter="game">游戏</button>
               <button class="filter-chip" type="button" data-filter="art">绘画</button>
               <button class="filter-chip" type="button" data-filter="life">生活</button>
-              <button class="filter-chip content-manage-trigger" type="button" data-content-admin-open>
-                <i data-lucide="settings-2" aria-hidden="true"></i>
-                <span>更新内容</span>
-              </button>
             </div>
           </div>
         </div>
@@ -458,47 +454,41 @@
     <template id="pictures-view-template">
       <section class="picture-wall" data-picture-wall>
         <input type="file" accept="image/*" multiple hidden data-picture-input />
-        <div class="picture-nav" aria-label="图片墙状态">
-          <span class="picture-nav-current" aria-current="page">
-            <i data-lucide="images" aria-hidden="true"></i>
-            <strong>图片墙</strong>
-          </span>
-          <span class="picture-nav-count" data-picture-wall-count>0 张</span>
+        <div class="picture-toolbar" aria-label="图片墙工具栏">
+          <span class="picture-wall-count-sr" data-picture-wall-count>0 张</span>
           <button class="picture-window-toggle" type="button" data-picture-fullscreen aria-label="展开图片墙窗口" aria-pressed="false">
             <i data-lucide="maximize-2" aria-hidden="true"></i>
             <span>展开</span>
           </button>
-          <button class="picture-return-inline" type="button" data-picture-return aria-label="返回小窝">
-            <i data-lucide="arrow-left" aria-hidden="true"></i>
-            <span>返回</span>
-          </button>
-        </div>
-        <div class="picture-actions" data-picture-editor aria-label="图片墙编辑">
-          <button class="picture-edit-toggle" type="button" data-picture-edit-toggle aria-expanded="false" aria-controls="picture-edit-menu">
-            <i data-lucide="sliders-horizontal" aria-hidden="true"></i>
-            <span>编辑</span>
-          </button>
-          <div class="picture-edit-menu" id="picture-edit-menu" data-picture-edit-menu>
-            <button type="button" data-picture-upload>上传图片</button>
-            <button type="button" data-picture-cancel>重置</button>
-            <button type="button" data-content-admin-open>管理内容</button>
-            <button class="picture-action-primary" type="button" data-picture-save>保存</button>
+          <div class="picture-actions" data-picture-editor aria-label="图片墙编辑">
+            <button class="picture-edit-toggle" type="button" data-picture-edit-toggle aria-expanded="false" aria-controls="picture-edit-menu">
+              <i data-lucide="sliders-horizontal" aria-hidden="true"></i>
+              <span>编辑</span>
+            </button>
+            <div class="picture-edit-menu" id="picture-edit-menu" data-picture-edit-menu>
+              <button type="button" data-picture-cancel>重置</button>
+              <button class="picture-action-primary" type="button" data-picture-save>保存</button>
+            </div>
           </div>
         </div>
         <div class="picture-stage" data-picture-stage aria-label="可拖动图片墙"></div>
         <form class="picture-compose" data-picture-compose>
           <label>
-            <span>描述</span>
-            <textarea data-picture-description rows="3" placeholder="这组图片的说明..."></textarea>
+            <span>相纸文字</span>
+            <textarea data-picture-description rows="3" placeholder="先写照片下方的文字，再上传图片或添加空白卡"></textarea>
           </label>
-          <button type="submit">添加空白卡</button>
+          <div class="picture-compose-actions">
+            <button type="button" data-picture-upload>上传带文字照片</button>
+            <button type="submit">添加空白卡</button>
+          </div>
         </form>
-        <p class="picture-hint">拖动相纸可以调整位置；保存前请先在管理面板输入密钥。</p>
+        <p class="picture-hint">点击相纸可以预览；拖动相纸可以调整位置；保存前请先输入管理密钥。</p>
       </section>
     </template>
 
     <section class="content-admin" data-content-admin hidden aria-hidden="true">
       <div class="content-admin-backdrop" data-content-admin-close aria-hidden="true"></div>
+      <div class="content-admin-toast" data-admin-toast role="status" aria-live="polite" hidden></div>
       <div class="content-admin-shell" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="content-admin-title">
         <div class="content-admin-topbar">
           <div>
@@ -512,7 +502,8 @@
 
         <div class="content-admin-grid">
           <form class="content-admin-panel" data-admin-media-form>
-            <h3>添加视频 / 图文攻略</h3>
+            <input name="editId" type="hidden" />
+            <h3 data-admin-media-title>添加视频 / 图文攻略</h3>
             <label>
               <span>标题</span>
               <input name="title" required placeholder="例如：新的绘画流程" />
@@ -549,12 +540,14 @@
             <div class="content-admin-actions">
               <button type="button" data-admin-fetch-cover>读取链接封面</button>
               <button type="button" data-admin-upload-cover>上传封面</button>
-              <button class="content-admin-primary" type="submit">添加到首页</button>
+              <button type="button" data-admin-cancel-media hidden>取消编辑</button>
+              <button class="content-admin-primary" type="submit"><span data-admin-media-submit-label>添加到首页</span></button>
             </div>
           </form>
 
           <form class="content-admin-panel" data-admin-collection-form>
-            <h3>添加可点开的图片小盒</h3>
+            <input name="editId" type="hidden" />
+            <h3 data-admin-collection-title>添加可点开的图片小盒</h3>
             <label>
               <span>小盒标题</span>
               <input name="title" required placeholder="例如：超可爱表情包" />
@@ -568,12 +561,14 @@
               <textarea name="description" rows="3" placeholder="点开小盒前看到的说明"></textarea>
             </label>
             <label>
-              <span>子页面图片</span>
+              <span>新增子页面图片</span>
               <input name="images" type="file" accept="image/*" multiple />
             </label>
+            <div class="collection-item-editor" data-admin-collection-items hidden></div>
             <div class="content-admin-actions">
               <button type="button" data-admin-upload-collection-cover>上传封面</button>
-              <button class="content-admin-primary" type="submit">添加小盒</button>
+              <button type="button" data-admin-cancel-collection hidden>取消编辑</button>
+              <button class="content-admin-primary" type="submit"><span data-admin-collection-submit-label>添加小盒</span></button>
             </div>
           </form>
         </div>
@@ -583,7 +578,12 @@
         <form class="content-admin-save" data-admin-save-form>
           <label>
             <span>管理密钥</span>
-            <input name="key" type="password" autocomplete="current-password" placeholder="只需要在保存时输入" />
+            <span class="admin-key-field">
+              <input name="key" type="password" autocomplete="current-password" placeholder="只需要在保存时输入" />
+              <button type="button" data-admin-toggle-key aria-label="显示管理密钥" aria-pressed="false">
+                <i data-lucide="eye" aria-hidden="true"></i>
+              </button>
+            </span>
           </label>
           <button class="content-admin-primary" type="submit">保存到网站</button>
           <p data-admin-status role="status" aria-live="polite"></p>

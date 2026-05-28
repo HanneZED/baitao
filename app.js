@@ -818,6 +818,9 @@ function setupContentManager() {
       siteContent = normalizeContent(defaultSiteContent);
       lastSavedContent = clone(siteContent);
       renderAll();
+    } finally {
+      window.kawaiiContentReady = true;
+      document.dispatchEvent(new CustomEvent("kawaii:content-ready"));
     }
   };
 
@@ -1039,21 +1042,22 @@ function setupContentManager() {
     if (!item) return null;
     const section = document.createElement("section");
     section.className = "dynamic-detail content-detail";
-    const paragraphs = (item.body || item.description)
+    const paragraphs = item.body
       .split(/\n{2,}/)
+      .filter((text) => text.trim())
       .map((text) => `<p>${escapeHtml(text)}</p>`)
       .join("");
     section.innerHTML = `
       <div class="content-detail-hero">
         <img src="${escapeHtml(item.cover || "./img/card.png")}" alt="" />
-        <div>
-          <span>${escapeHtml(mediaLabel(item.type, item.category))}</span>
+        <div class="content-detail-copy">
+          <span class="content-detail-kicker">${escapeHtml(mediaLabel(item.type, item.category))}</span>
           <h1>${escapeHtml(item.title)}</h1>
           <p>${escapeHtml(item.description)}</p>
           ${item.url ? `<a class="button button-primary" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><span>打开原链接</span><i data-lucide="external-link" aria-hidden="true"></i></a>` : ""}
         </div>
       </div>
-      <article class="content-detail-body">${paragraphs}</article>
+      ${paragraphs ? `<article class="content-detail-body">${paragraphs}</article>` : ""}
     `;
     return { title: item.title, node: section };
   };
@@ -1066,8 +1070,8 @@ function setupContentManager() {
     section.innerHTML = `
       <div class="content-detail-hero">
         <img src="${escapeHtml(item.cover || "./img/card.png")}" alt="" />
-        <div>
-          <span>Picture Box</span>
+        <div class="content-detail-copy">
+          <span class="content-detail-kicker">Picture Box</span>
           <h1>${escapeHtml(item.title)}</h1>
           <p>${escapeHtml(item.description)}</p>
         </div>
@@ -2721,23 +2725,29 @@ function setupGuideView() {
     hideView();
   });
 
+  let didOpenInitialHash = false;
+
   const openInitialHashView = () => {
+    if (didOpenInitialHash) return;
     const hash = window.location.hash;
     if (!hash || hash.length <= 1) return;
 
     const templateTrigger = document.querySelector(`[data-view-template][data-view-path="${CSS.escape(hash)}"]`);
     if (templateTrigger) {
       openTemplateView(templateTrigger.dataset.viewTemplate, { push: false, depth: 1 });
+      didOpenInitialHash = true;
       return;
     }
 
     const detailId = decodeURIComponent(hash.slice(1));
     if (window.kawaiiContent?.createDetail?.(detailId)) {
       openContentDetail(detailId, { push: false, depth: 1 });
+      didOpenInitialHash = true;
     }
   };
 
   requestAnimationFrame(openInitialHashView);
+  document.addEventListener("kawaii:content-ready", openInitialHashView);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

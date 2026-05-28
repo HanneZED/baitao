@@ -1,39 +1,17 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T07:36:42.186Z",
+  "updatedAt": "2026-05-28T07:40:41.512Z",
   "media": [
     {
-      "id": "media-starlight-route",
-      "type": "guide",
-      "category": "game",
-      "title": "星光地图收集路线",
-      "description": "适合记录开放世界每日路线、材料收集、传送点顺序和高收益绕路。",
-      "url": "./guides/starlight-route.html",
-      "cover": "./assets/work-guide.svg",
-      "tags": "game route collect openworld",
-      "body": ""
-    },
-    {
-      "id": "media-brush-workflow",
-      "type": "guide",
-      "category": "art",
-      "title": "插画笔刷与上色流程",
-      "description": "从草稿、线稿、铺色、阴影到导出的个人绘画流程模板。",
-      "url": "./guides/brush-workflow.html",
-      "cover": "./assets/work-illustration.svg",
-      "tags": "art brush workflow illustration",
-      "body": ""
-    },
-    {
-      "id": "media-cozy-desk",
-      "type": "guide",
-      "category": "life",
-      "title": "可爱桌面布置清单",
-      "description": "小灯、收纳、背景布、拍照角度和桌面维护节奏。",
-      "url": "./guides/cozy-desk.html",
-      "cover": "./assets/work-room.svg",
-      "tags": "life room photo setup",
-      "body": ""
+      "id": "media-mpp6lkjv-gnkrct",
+      "type": "video",
+      "category": "video",
+      "title": "【我妻善逸手书】死んだ！（死掉啦！）",
+      "description": "测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试",
+      "url": "https://www.bilibili.com/video/BV1Qm98BgEBL/?spm_id_from=333.1387.favlist.content.click&vd_source=81edac033699e694765d4e2668e72d82",
+      "cover": "./img/uploads/1779954041192-231eada9.webp",
+      "tags": "video video",
+      "body": "测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试"
     },
     {
       "id": "media-bilibili-home",

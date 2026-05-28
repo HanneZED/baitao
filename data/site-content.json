@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T09:21:13.508Z",
+  "updatedAt": "2026-05-28T09:21:38.696Z",
   "media": [
     {
       "id": "media-mpp6lkjv-gnkrct",
@@ -97,8 +97,8 @@
       "src": "./img/card.png",
       "title": "今天也把可爱收好",
       "description": "今天也把可爱收好。",
-      "x": 19.86661788214003,
-      "y": 68.0208653670091,
+      "x": 87.46577076819183,
+      "y": 32.868426875064245,
       "rotation": 7,
       "size": "large"
     },
@@ -137,15 +137,6 @@
       "x": 64.92365594895966,
       "y": 35.42104982074938,
       "rotation": 12
-    },
-    {
-      "id": "picture-mppa9mgy-wlsv0r",
-      "src": "./img/uploads/1779960073052-ecb662fe.jpg",
-      "title": "43f78674669b5ac0f7e0ce421844e302",
-      "description": "43f78674669b5ac0f7e0ce421844e302",
-      "x": 48,
-      "y": 51,
-      "rotation": 11
     }
   ]
 }

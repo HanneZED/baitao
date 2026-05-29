@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-29T01:36:28.144Z",
+  "updatedAt": "2026-05-29T01:45:14.243Z",
   "site": {
     "brand": {
       "name": "肥窝",
@@ -165,7 +165,7 @@
   "collections": [
     {
       "id": "collection-stickers",
-      "title": "超可爱表情包",
+      "title": "这是狒狒约拍",
       "description": "把喜欢的贴纸、表情包和小图收成一盒彩色糖纸。",
       "cover": "./img/card.png",
       "items": [

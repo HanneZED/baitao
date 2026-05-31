@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-31T09:14:41.248Z",
+  "updatedAt": "2026-05-31T09:17:19.207Z",
   "site": {
     "brand": {
       "name": "肥窝",
@@ -217,9 +217,36 @@
       "src": "./img/uploads/1780218880841-839343d4.png",
       "title": "桃",
       "description": "桃",
-      "x": 8,
-      "y": 56.56922795222356,
+      "x": 18.606602941461983,
+      "y": 34.049998356745796,
       "rotation": -7
+    },
+    {
+      "id": "picture-mptkf22g-mxxiex",
+      "src": "./img/uploads/1780219037759-f94aefbd.png",
+      "title": "白桃",
+      "description": "白桃",
+      "x": 39.863139479910394,
+      "y": 32.81923147348257,
+      "rotation": -12
+    },
+    {
+      "id": "picture-mptkfgcx-jn4g8y",
+      "src": "./img/uploads/1780219038300-252fa07e.jpg",
+      "title": "桃",
+      "description": "桃",
+      "x": 84.9697437331664,
+      "y": 35.696158775916466,
+      "rotation": 5
+    },
+    {
+      "id": "picture-mptkfv5h-8m20ef",
+      "src": "./img/uploads/1780219038789-5e374e87.jpg",
+      "title": "白桃",
+      "description": "白桃",
+      "x": 62.530950468231744,
+      "y": 33.42691157414363,
+      "rotation": 8
     }
   ]
 }

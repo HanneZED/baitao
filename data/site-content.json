@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-31T09:05:57.652Z",
+  "updatedAt": "2026-05-31T09:14:41.248Z",
   "site": {
     "brand": {
       "name": "肥窝",
@@ -213,67 +213,13 @@
   ],
   "pictures": [
     {
-      "id": "cc3-1",
-      "src": "./img/cc3/cc3_1.jpg",
-      "title": "软乎乎的小画稿",
-      "description": "软乎乎的小画稿。",
-      "x": 14.448327355306088,
-      "y": 76.4840492117286,
-      "rotation": -18
-    },
-    {
-      "id": "cc3-2",
-      "src": "./img/cc3/cc3_2.jpg",
-      "title": "夹在纸页里的灵感",
-      "description": "夹在纸页里的灵感。",
-      "x": 66.98221551228615,
-      "y": 68.76995721642206,
-      "rotation": 14
-    },
-    {
-      "id": "cc3-3",
-      "src": "./img/cc3/cc3_3.jpg",
-      "title": "像贴纸一样贴上去",
-      "description": "像贴纸一样贴上去。",
-      "x": 31.299312844885247,
-      "y": 14.81308396400868,
-      "rotation": -10
-    },
-    {
-      "id": "cc3-4",
-      "src": "./img/cc3/cc3_4.jpg",
-      "title": "拖一拖，换个角度",
-      "description": "拖一拖，换个角度。",
-      "x": 40.68179495647802,
-      "y": 84.41179957022268,
-      "rotation": -14
-    },
-    {
-      "id": "cc3-5",
-      "src": "./img/cc3/cc3_5.jpg",
-      "title": "小小的收藏角落",
-      "description": "小小的收藏角落。",
-      "x": 35.169835819471544,
-      "y": 50.65908098371298,
-      "rotation": 18
-    },
-    {
-      "id": "cc3-6",
-      "src": "./img/cc3/cc3_6.jpg",
-      "title": "再偷偷添一张",
-      "description": "再偷偷添一张。",
-      "x": 67.51235337856943,
-      "y": 21.47619522122818,
-      "rotation": 12
-    },
-    {
-      "id": "picture-mppl3xji-saf1yo",
-      "src": "./img/uploads/1779978297777-90113c43.jpg",
-      "title": "粉色的",
-      "description": "粉色的",
-      "x": 59.16684134854251,
-      "y": 36.00294519577494,
-      "rotation": -1
+      "id": "picture-mptkcow0-s12zd8",
+      "src": "./img/uploads/1780218880841-839343d4.png",
+      "title": "桃",
+      "description": "桃",
+      "x": 8,
+      "y": 56.56922795222356,
+      "rotation": -7
     }
   ]
 }

@@ -1884,6 +1884,7 @@ function setupContentManager() {
       images.splice(Number(removeShowcase.dataset.adminRemoveShowcase), 1);
       siteContent.site = readSiteTextEditor();
       siteContent.site.showcaseImages = images;
+      renderShowcaseEditor();
       markAdminDirty("已从轮播图预览里移除。确认没问题后点“保存到网站”。");
       return;
     }
@@ -1983,9 +1984,27 @@ function setupContentManager() {
   });
 
   admin?.querySelector("[data-admin-upload-showcase]")?.addEventListener("click", async () => {
-    const [file] = await pickFile(false);
-    if (!file) return;
-    appendShowcaseEditorRow(await fileToDataUrl(file));
+    const currentImages = readShowcaseImagesFromEditor();
+    const maxShowcaseImages = 6;
+    const remaining = maxShowcaseImages - currentImages.length;
+
+    if (remaining <= 0) {
+      setAdminStatus("轮播图片最多 6 张。", "error");
+      return;
+    }
+
+    const files = await pickFile(true);
+    if (!files.length) return;
+
+    for (const file of files.slice(0, remaining)) {
+      appendShowcaseEditorRow(await fileToDataUrl(file));
+    }
+
+    if (files.length > remaining) {
+      setAdminStatus(`已添加前 ${remaining} 张，轮播图片最多 6 张。`, "loading");
+    } else {
+      setAdminStatus("轮播图已添加到编辑列表。确认没问题后点“更新网页文字预览”。", "loading");
+    }
   });
 
   admin?.querySelector("[data-admin-toggle-key]")?.addEventListener("click", (event) => {

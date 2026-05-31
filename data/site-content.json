@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-31T03:06:00.975Z",
+  "updatedAt": "2026-05-31T03:11:41.190Z",
   "site": {
     "brand": {
       "name": "肥窝",
@@ -98,7 +98,6 @@
     "showcaseImages": [
       "./img/cc1/cc1_1.jpg",
       "./img/cc1/cc1_2.jpg",
-      "./img/cc1/cc1_3.jpg",
       "./img/cc1/cc1_4.jpg"
     ]
   },

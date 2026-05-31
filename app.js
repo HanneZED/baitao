@@ -1271,6 +1271,17 @@ function setupContentManager() {
       .filter(Boolean)
       .slice(0, 6);
 
+  const syncSiteEditorToContent = () => {
+    if (!siteForm) return;
+
+    siteContent.site = readSiteTextEditor();
+    siteContent.site.showcaseImages = readShowcaseImagesFromEditor().slice(0, 6);
+
+    if (!siteContent.site.showcaseImages.length) {
+      siteContent.site.showcaseImages = clone(defaultSiteContent.site.showcaseImages);
+    }
+  };
+  
   const renderShowcaseEditor = () => {
     const list = siteForm?.querySelector("[data-admin-showcase-list]");
     if (!list) return;
@@ -1471,6 +1482,8 @@ function setupContentManager() {
   };
 
   const saveSiteContent = async () => {
+    syncSiteEditorToContent();
+
     const key = getAdminKey();
     if (!key) {
       openAdmin();
@@ -1478,16 +1491,20 @@ function setupContentManager() {
       return false;
     }
 
+    const contentToSave = normalizeContent(siteContent);
+
     setAdminStatus("正在保存到 GitHub，并等待 Vercel 自动部署...", "loading");
     try {
       const response = await fetch("/api/content", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ key, content: siteContent }),
+        body: JSON.stringify({ key, content: contentToSave }),
       });
+
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "保存失败");
-      siteContent = normalizeContent(data);
+
+      siteContent = contentToSave;
       lastSavedContent = clone(siteContent);
       hasUnsavedChanges = false;
       renderAll();
@@ -1985,8 +2002,7 @@ function setupContentManager() {
 
   admin?.querySelector("[data-admin-upload-showcase]")?.addEventListener("click", async () => {
     const currentImages = readShowcaseImagesFromEditor();
-    const maxShowcaseImages = 6;
-    const remaining = maxShowcaseImages - currentImages.length;
+    const remaining = 6 - currentImages.length;
 
     if (remaining <= 0) {
       setAdminStatus("轮播图片最多 6 张。", "error");
@@ -2000,10 +2016,16 @@ function setupContentManager() {
       appendShowcaseEditorRow(await fileToDataUrl(file));
     }
 
+    syncSiteEditorToContent();
+    hasUnsavedChanges = true;
+    renderShowcaseImages();
+    setupHeroArtworkSlider();
+    setupShowcaseSliders();
+
     if (files.length > remaining) {
-      setAdminStatus(`已添加前 ${remaining} 张，轮播图片最多 6 张。`, "loading");
+      setAdminStatus(`已添加前 ${remaining} 张，轮播图片最多 6 张。确认没问题后点“保存到网站”。`, "loading");
     } else {
-      setAdminStatus("轮播图已添加到编辑列表。确认没问题后点“更新网页文字预览”。", "loading");
+      setAdminStatus("轮播图已添加到页面预览。确认没问题后点“保存到网站”。", "loading");
     }
   });
 

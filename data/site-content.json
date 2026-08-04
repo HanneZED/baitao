@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-15T03:24:48.757Z",
+  "updatedAt": "2026-08-04T04:34:26.738Z",
   "site": {
     "brand": {
       "name": "肥窝",
@@ -96,11 +96,11 @@
       "right": "橱窗 / 攻略 / 个人小窝"
     },
     "showcaseImages": [
-      "./img/cc1/cc1_4.jpg",
-      "./img/uploads/1781869756621-0fcb2a0c.jpg",
-      "./img/uploads/1781869757341-4507de1b.jpg",
       "./img/uploads/1784085887041-9f8c180b.jpg",
-      "./img/uploads/1784085887819-d746522e.jpg"
+      "./img/uploads/1784085887819-d746522e.jpg",
+      "./img/uploads/1785818065157-cca4737a.jpg",
+      "./img/uploads/1785818065821-aeeb799a.jpg",
+      "./img/uploads/1785818066282-cd5ee2c1.jpg"
     ]
   },
   "bgm": [
